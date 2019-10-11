@@ -1,27 +1,30 @@
+#!/usr/bin/env python3
 from pymongo import MongoClient
-
+from .hosts import mongodbHost as HOST
+from .hosts import mongodbPort as PORT
 
 class MDBclient:
+    client = None
 
-    def __init__ (self, host="localhost", port = 8000):
-        self.host = host
-        self.port = port
-        self.client = 0
+    @staticmethod
+    def getClient():
+        if MDBclient.client == None:
+            try:
+                MDBclient.client = MongoClient(HOST, PORT)
+            except:
+                # set to log in future
+                print("Could not connect to mongodb client")
+                MDBclient.client = None
+        return MDBclient.client
     
-    def createClient(self):
-        try:
-            client = MongoClient(self.host, self.port)
-            self.client = client
-        except:
+    @staticmethod
+    def closeClient():
+        if MDBclient.client == None:
             # set to log in future
-            print("Could not connect to mongodb client")
-        return self.client
-
-    def closeClient(self):
-        if self.client != 0:
             print("nothing to close")
-            return
-        self.client.close()
+            return 1
+        MDBclient.client.close()
+        return 1
     
         
 

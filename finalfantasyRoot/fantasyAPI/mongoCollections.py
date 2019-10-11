@@ -1,22 +1,23 @@
-from connections import MDBclient
+from ..finalfantasyRoot import connections as mdb
 
-class FantasyCollections:
-
-    def __init__(self):
-        #default client is localhost
-        self.mongoClient = MDBclient()
+def isConnected():
+    if mdb.getClient() == None:
+        return False
+    return True
     
-    def setCollection(self, collection):
-        self.collection = self.mongoClient[collection]
+def update_one(db, collection, query):
+    if isConnected():
+        mdb.client[db][collection]
+        mdb.update_one(query)
+    
+def insert_one(db, collection, query):
+    if isConnected():
+        mdb.client[db][collection]
+        mdb.insert_one(query)
+    
+def delete_one(db, collection, query):
+    if isConnected():
+        mdb.client[db][collection]
+        mdb.delete_one(query)
 
-    def insert(self, **kwargs):
-        pass
 
-    def update(self, **kwargs):
-        pass
-
-    def delete(self, **kwargs):
-        pass
-
-    def query(self, **kwargs):
-        pass

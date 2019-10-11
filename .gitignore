@@ -133,3 +133,7 @@ dmypy.json
 # Remove previous ipynb_checkpoints
 #   git rm -r .ipynb_checkpoints/
 #
+
+# secret keys
+finalfantasyRoot/finalfantasyRoot/hosts.py
+
