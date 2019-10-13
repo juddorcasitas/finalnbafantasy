@@ -1,9 +1,12 @@
-from ..finalfantasyRoot import connections as mdb
+from finalfantasyRoot import connections
+
+mdb = connections.MDBclient()
 
 def isConnected():
     if mdb.getClient() == None:
         return False
     return True
+    #
     
 def update_one(db, collection, query):
     if isConnected():
