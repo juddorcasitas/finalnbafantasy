@@ -4,33 +4,26 @@ from .hosts import mongodbHost as HOST
 from .hosts import mongodbPort as PORT
 
 class MDBclient:
-    
+    client = None
 
-    def __init__(self):
-        self.client = MongoClient(HOST, PORT)
-        print("Client up") #debug
-
-    #@staticmethod
-    def getClient(self):
-        if self.client == None:
-            print("No Client") #debug
+    @staticmethod
+    def getClient():
+        if MDBclient.client == None:
             try:
-                self.client = MongoClient(HOST, PORT)
+                MDBclient.client = MongoClient(HOST, PORT)
             except:
                 # set to log in future
                 print("Could not connect to mongodb client")
-                self.client = None
-        else:
-            print("Cleint up") #debug
-            return self.client
+                MDBclient.client = None
+        return MDBclient.client
     
-    #@staticmethod
-    def closeClient(self):
-        if self.client == None:
+    @staticmethod
+    def closeClient():
+        if MDBclient.client == None:
             # set to log in future
             print("nothing to close")
             return 1
-        self.client.close()
+        MDBclient.client.close()
         return 1
     
         
