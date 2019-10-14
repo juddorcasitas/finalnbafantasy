@@ -3,28 +3,47 @@ from pymongo import MongoClient
 from .hosts import mongodbHost as HOST
 from .hosts import mongodbPort as PORT
 
-class MDBclient:
-    client = None
+class MDBclient(object):
+    
+    def __init__(self):
+        self.client = MongoClient(HOST, PORT)
+        print("Client up: {}".format(self.client)) #debug
 
-    @staticmethod
-    def getClient():
-        if MDBclient.client == None:
+    def getClient(self):
+        if self.client == None:
+            print("No Client") #debug
             try:
-                MDBclient.client = MongoClient(HOST, PORT)
+                self.client = MongoClient(HOST, PORT)
+                return self.client
             except:
                 # set to log in future
                 print("Could not connect to mongodb client")
-                MDBclient.client = None
-        return MDBclient.client
+                self.client = None
+        else:
+            print("Cleint up") #debug
+            return self.client
     
-    @staticmethod
-    def closeClient():
-        if MDBclient.client == None:
+    def closeClient(self):
+        if self.client == None:
             # set to log in future
             print("nothing to close")
-            return 1
-        MDBclient.client.close()
-        return 1
+        self.client.close()
     
-        
+    def insert_one(self, db, collection, query):
+        mydb = self.client[db]
+        mycol = mydb[collection]
+        mycol.insert_one(query)
+        pass
 
+    def update_one(self, db, collection, query):
+        mydb = self.client[db]
+        mycol = mydb[collection]
+    
+    def delete_one(self, db, collection, query):
+        mydb = self.client[db]
+        mycol = mydb[collection]
+
+    def find(self, db, collection, query):
+        mydb = self.client[db]
+        mycol = mydb[collection]
+        return mycol.find(query)

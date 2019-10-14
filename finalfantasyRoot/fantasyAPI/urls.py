@@ -17,7 +17,7 @@ from django.urls import path
 from .views import search, load_player_data
 
 urlpatterns = [
-    path('search', search),
+    path('search/', search),
     path('retrieve_data', search),
     path('load_player_data',load_player_data)
 ]
