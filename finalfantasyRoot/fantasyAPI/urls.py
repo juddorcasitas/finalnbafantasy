@@ -14,10 +14,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from .views import search, load_player_data
+from .views import search, load_player_data, import_player_gamesDB, retreive_data
 
 urlpatterns = [
     path('search/', search),
-    path('retrieve_data', search),
-    path('load_player_data',load_player_data)
+    path('retrieve_data', retreive_data),
+    path('load_player_data',load_player_data), #disable or remove for production
+    path('load_player_gameDB',import_player_gamesDB)
 ]
