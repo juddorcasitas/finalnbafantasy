@@ -8,7 +8,7 @@ import {
 function LoadProfile(props){
     let {url, path} = useRouteMatch();
     let fetchPlayerInfo = function(){
-        console.log("retrieving: " + this.props.playerId);
+        console.log("retrieving: " + this.props.personId);
         // localhost:8000/retrieve_data
         fetch('http://localhost:8000/retrieve_data')
         .then(response => response.json())
@@ -40,7 +40,7 @@ class PlayerProfile extends Component{
     }
 
     handleSearchResultsOnClick = (e, data, func) => {
-        console.log("You clicked on: " + data.playerId);
+        console.log("You clicked on: " + data.personId);
     }
 
     render(){

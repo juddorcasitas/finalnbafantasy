@@ -2,25 +2,56 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from fantasyAPI.mongoCollections  import connections
 from datetime import datetime
+import pymongo
+import json
 
 # Create your views here.
 def search(request):
     print("Hello from search") #debug
     print("") #debug
     player_name = request.GET['player_name']
-    query ={ '$or' : [ {"firstName" : { "$regex": "^{}".format(player_name) } },{"lastName" : { "$regex": "^{}".format(player_name) } } ] }
+    query ={ '$or' : [ {"firstName" : { "$regex": ".*{}.*".format(player_name), '$options':'i'} },{"lastName" : { "$regex": ".*{}.*".format(player_name), '$options':'i' } } ] }
     print(query) #debug
     print("is Connected: {}".format(connections.isConnected())) #debug
     #query = {}
-    data = connections.find("player_data_db","player_data",query)
+    data = connections.find("player_data_db","player_data",query).sort([('firstName', pymongo.ASCENDING), ('lastName', pymongo.ASCENDING)])
     print(data) #debug
     print(type(data)) #debug
     found_list = []
     for i in data:
+        del i['_id']
         found_list.append(i)
-    return HttpResponse(found_list, content_type='application/json')
-            
-def retreive_data(request):
+    print(len(found_list))
+    print(found_list)
+    res = {"query": found_list}
+    res = HttpResponse(json.dumps(res), content_type='application/json')
+    print(res)
+    return res
+
+# WIP
+def retreive_player_data(request):
+    print("Hello from search") #debug
+    print("") #debug
+    player_name = request.GET['personId']
+    query ={'personId'}
+    print(query) #debug
+    print("is Connected: {}".format(connections.isConnected())) #debug
+    #query = {}
+    data = connections.find("player_data_db","player_data",query).sort([('firstName', pymongo.ASCENDING), ('lastName', pymongo.ASCENDING)])
+    print(data) #debug
+    print(type(data)) #debug
+    found_list = []
+    for i in data:
+        del i['_id']
+        found_list.append(i)
+    print(len(found_list))
+    print(found_list)
+    res = {"query": found_list}
+    res = HttpResponse(json.dumps(res), content_type='application/json')
+    print(res)
+    return res
+
+def retreive_game_data(request):
     print("Hello from retreive_data") #debug
     person_id = request.GET['personId']
     player_code = request.GET['playerCode']
@@ -39,7 +70,7 @@ def retreive_data(request):
 def load_player_data(request):
     import os
     import json
-    filepath = '/home/tomi/Sandbox/ffBackend/finalfantasy/data/player_data_folder' #right click and use 'copyfull path' as paste here
+    filepath = '/Users/judd/VscodeProjects/finalfantasy/data_scraping/player_data_folder' #right click and use 'copyfull path' as paste here
     print("Hello from load_player_data") #debug
     print("is Connected: {}".format(connections.isConnected())) #debug
     filename = "player_data.json"
@@ -54,7 +85,7 @@ def import_player_gamesDB(request):
     import os
     import json
 
-    filepath = '/home/tomi/Sandbox/ffBackend/finalfantasy/data/player_data_folder' #right click and use 'copyfull path' as paste here
+    filepath = '/Users/judd/VscodeProjects/finalfantasy/data_scraping/player_data_folder' #right click and use 'copyfull path' as paste here
     print("Hello from import_player_gamesDB") #debug
     print("is Connected: {}".format(connections.isConnected())) #debug
     filename = "game_data.json"

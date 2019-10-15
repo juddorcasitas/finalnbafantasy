@@ -11,18 +11,19 @@ import _ from 'lodash'
 
 function SearchResult(props){
     let {path, url} = useRouteMatch();
+    let playerURL = props.personId + "_"+props.playercode ;
     return(
     <div 
     className={classNames.searchPlayerRow}
     onClick={props.onClick}>
-        <Link to={`${url}/${props.playerId}`}>
+        <Link to={`${url}/${playerURL}`}>
             <p>
                 <span>{props.firstname}</span>
                 <span>{props.lastname}</span>
                 <span>{props.team}</span>
             </p>
         </Link>
-        <Route path={`${path}/:playerId`}/>
+        <Route path={`${path}/:playerURL`}/>
     </div>)
 }
 
@@ -57,21 +58,39 @@ class SearchBar extends Component {
         // player5:{firstname: "fname5", lastname: "lname5", team: "team5", playerId: "p5Id"},
         // player6:{firstname: "fname6", lastname: "lname6", team: "team6", playerId: "p6Id"}    
         // }});
+        var obj = this;
+        function setState(data){
+            console.log(data.query);
+            obj.setState({results: data.query});
+        }
+        
+        console.log("retrieving: " + input);
+        // localhost:8000/retrieve_data
+        fetch('http://127.0.0.1:8000/search/?player_name=' + input, {
+            mode: 'cors',
+            method: 'GET',
+            headers: {
+                "content-type": "application/json",
+              },
 
-        let fetchPlayerInfo = function(){
-            console.log("retrieving: " + this.props.playerId);
-            // localhost:8000/retrieve_data
-            fetch('http://localhost:8000/retrieve_data')
-            .then(response => response.json())
-            .then(data =>{
-                console.log("data returned: " + data);
-                this.setState({
-                    playerInfo: data,
-                    isLoading: false,
-                });
-            
-            })
-            .catch(error => this.setState({error, isLoading:false}));
+        }).then(
+            function(response) {
+                // console.log(response.body.json());
+              if (response.status !== 200) {
+                console.log('Looks like there was a problem. Status Code: ' +
+                  response.status);
+                return;
+              }
+              // Examine the text in the response
+              return response.json();
+            }
+          ).then(function(data) {
+            console.log(data);
+            setState(data);
+          })
+          .catch(function(err) {
+            console.log('Fetch Error :-S', err);
+          });
 
     }
 
@@ -93,10 +112,11 @@ class SearchBar extends Component {
                         {Object.keys(this.state.results).map((key, index) => 
                         <SearchResult
                             key = {index}
-                            playerId = {this.state.results[key].playerId}
-                            firstname = {this.state.results[key].firstname}
-                            lastname = {this.state.results[key].lastname}
-                            team = {this.state.results[key].team}
+                            personId = {this.state.results[key].personId}
+                            firstname = {this.state.results[key].firstName}
+                            lastname = {this.state.results[key].lastName}
+                            team = {this.state.results[key].teamId}
+                            playercode ={this.state.results[key].teamSitesOnly.playerCode}
                             onClick = {(e) => this.props
                                 .resultsOnClick(
                                     e, 
