@@ -7,6 +7,9 @@ class classNames {
         this.wrapperModal = "wrapper-modal";
         this.search = "search";
         this.searchPlayerRow = "search-player-row";
+        this.main = "Main";
+        this.header = "App-header";
+        this.home = "home";
 
 
     }

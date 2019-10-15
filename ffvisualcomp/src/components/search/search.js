@@ -1,23 +1,29 @@
 import React, {Component} from "react"
 import classNames from '../utils/class-css'
+import {
+    Link,
+    Route,
+    useRouteMatch
+} from 'react-router-dom'
 import _ from 'lodash'
 
 // const playerAPI = 'https://';
 
-class SearchResult extends Component{
-    render(){
-        return(
-        <div 
-        className={classNames.searchPlayerRow}
-        onClick={this.props.onClick}>
+function SearchResult(props){
+    let {path, url} = useRouteMatch();
+    return(
+    <div 
+    className={classNames.searchPlayerRow}
+    onClick={props.onClick}>
+        <Link to={`${url}/${props.playerId}`}>
             <p>
-                <span>{this.props.firstname}</span>
-                <span>{this.props.lastname}</span>
-                <span>{this.props.team}</span>
+                <span>{props.firstname}</span>
+                <span>{props.lastname}</span>
+                <span>{props.team}</span>
             </p>
-        </div>);
-    }
-
+        </Link>
+        <Route path={`${path}/:playerId`}/>
+    </div>)
 }
 
 class SearchBar extends Component {
@@ -53,12 +59,6 @@ class SearchBar extends Component {
 
     }
 
-    handleOnClick = (e, data) => {
-        console.log("You clicked on: " + data.playerId);
-        this.setState({value: '',
-            results: {}});
-    }
-
     render () {
         return (
             <div className={classNames.wrapperLarge}>
@@ -81,7 +81,11 @@ class SearchBar extends Component {
                             firstname = {this.state.results[key].firstname}
                             lastname = {this.state.results[key].lastname}
                             team = {this.state.results[key].team}
-                            onClick = {(e, data) => this.handleOnClick(e, this.state.results[key])}
+                            onClick = {(e) => this.props
+                                .resultsOnClick(
+                                    e, 
+                                    this.state.results[key],
+                                    this.setState({value: '', results: {}}))}
                         />)}
                     </div>
                 </div>
