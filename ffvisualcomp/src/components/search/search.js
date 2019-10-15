@@ -43,19 +43,35 @@ class SearchBar extends Component {
         this.getSearchquery(input);
     }
 
+
     getSearchquery = (input) =>{
         if (input === ""){
             this.setState({results: {}});
             return;
         }
         console.log("Search Query: " + input);
-        this.setState({results: {player1: {firstname: "fname1", lastname: "lname1", team: "team1", playerId: "p1Id"},
-        player2:{firstname: "fname2", lastname: "lname2", team: "team2", playerId: "p2Id"},
-        player3:{firstname: "fname3", lastname: "lname3", team: "team3", playerId: "p3Id"},
-        player4:{firstname: "fname4", lastname: "lname4", team: "team4", playerId: "p4Id"},
-        player5:{firstname: "fname5", lastname: "lname5", team: "team5", playerId: "p5Id"},
-        player6:{firstname: "fname6", lastname: "lname6", team: "team6", playerId: "p6Id"}    
-        }});
+        // this.setState({results: {player1: {firstname: "fname1", lastname: "lname1", team: "team1", playerId: "p1Id"},
+        // player2:{firstname: "fname2", lastname: "lname2", team: "team2", playerId: "p2Id"},
+        // player3:{firstname: "fname3", lastname: "lname3", team: "team3", playerId: "p3Id"},
+        // player4:{firstname: "fname4", lastname: "lname4", team: "team4", playerId: "p4Id"},
+        // player5:{firstname: "fname5", lastname: "lname5", team: "team5", playerId: "p5Id"},
+        // player6:{firstname: "fname6", lastname: "lname6", team: "team6", playerId: "p6Id"}    
+        // }});
+
+        let fetchPlayerInfo = function(){
+            console.log("retrieving: " + this.props.playerId);
+            // localhost:8000/retrieve_data
+            fetch('http://localhost:8000/retrieve_data')
+            .then(response => response.json())
+            .then(data =>{
+                console.log("data returned: " + data);
+                this.setState({
+                    playerInfo: data,
+                    isLoading: false,
+                });
+            
+            })
+            .catch(error => this.setState({error, isLoading:false}));
 
     }
 
