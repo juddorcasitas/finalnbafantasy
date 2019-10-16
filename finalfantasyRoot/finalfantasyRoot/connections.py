@@ -43,7 +43,7 @@ class MDBclient(object):
         mydb = self.client[db]
         mycol = mydb[collection]
 
-    def find(self, db, collection, query):
+    def find(self, db, collection, query, applyFilter):
         mydb = self.client[db]
         mycol = mydb[collection]
-        return mycol.find(query)
+        return mycol.find(query, applyFilter)

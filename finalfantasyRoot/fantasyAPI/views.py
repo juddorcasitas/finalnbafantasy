@@ -6,26 +6,43 @@ import pymongo
 import json
 
 # Create your views here.
-def search(request):
+def player_search(request):
     print("Hello from search") #debug
-    print("") #debug
     player_name = request.GET['player_name']
-    query ={ '$or' : [ {"firstName" : { "$regex": ".*{}.*".format(player_name), '$options':'i'} },{"lastName" : { "$regex": ".*{}.*".format(player_name), '$options':'i' } } ] }
+    query = { '$or' : [ {"firstName" : 
+                            { "$regex": ".*{}.*".format(player_name), 
+                            '$options':'i'
+                            } 
+                        },   {"lastName" : 
+                                { "$regex": ".*{}.*".format(player_name),
+                                 '$options':'i' 
+                                } 
+                            } 
+                        ] 
+            }
+    applyFilter = {
+                "_id": 0, 
+                "firstName": 1, 
+                "lastName": 1, 
+                "personId": 1, 
+                "teamSitesOnly.playerCode": 1}
+    
     print(query) #debug
     print("is Connected: {}".format(connections.isConnected())) #debug
     #query = {}
-    data = connections.find("player_data_db","player_data",query).sort([('firstName', pymongo.ASCENDING), ('lastName', pymongo.ASCENDING)])
-    print(data) #debug
-    print(type(data)) #debug
     found_list = []
-    for i in data:
-        del i['_id']
-        found_list.append(i)
-    print(len(found_list))
-    print(found_list)
+    try:
+        data = connections.find("player_data_db","player_data",query, applyFilter).sort([('firstName', pymongo.ASCENDING), ('lastName', pymongo.ASCENDING)])
+        print(data) #debug
+        for i in data:
+            found_list.append(i)
+        print("query {} items".format(len(found_list)))
+    except Exception as exc:
+        print("Mongo Query failed: ")
+        print(exc)
+
     res = {"query": found_list}
     res = HttpResponse(json.dumps(res), content_type='application/json')
-    print(res)
     return res
 
 # WIP

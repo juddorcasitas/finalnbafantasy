@@ -2,7 +2,6 @@ import React, {Component} from "react"
 import classNames from '../utils/class-css'
 import {
     Link,
-    Route,
     useRouteMatch
 } from 'react-router-dom'
 import _ from 'lodash'
@@ -10,20 +9,18 @@ import _ from 'lodash'
 // const playerAPI = 'https://';
 
 function SearchResult(props){
-    let {path, url} = useRouteMatch();
     let playerURL = props.personId + "_"+props.playercode ;
     return(
     <div 
     className={classNames.searchPlayerRow}
     onClick={props.onClick}>
-        <Link to={`${url}/${playerURL}`}>
-            <p>
-                <span>{props.firstname}</span>
-                <span>{props.lastname}</span>
-                <span>{props.team}</span>
-            </p>
-        </Link>
-        <Route path={`${path}/:playerURL`}/>
+            <Link to={`/player-profile/${playerURL}`}>
+                <p>
+                    <span>{props.firstname}</span>
+                    <span>{props.lastname}</span>
+                    <span>{props.team}</span>
+                </p>
+            </Link>
     </div>)
 }
 
@@ -46,19 +43,13 @@ class SearchBar extends Component {
 
 
     getSearchquery = (input) =>{
+        var obj = this;
         if (input === ""){
-            this.setState({results: {}});
+            obj.setState({results: {}});
             return;
         }
         console.log("Search Query: " + input);
-        // this.setState({results: {player1: {firstname: "fname1", lastname: "lname1", team: "team1", playerId: "p1Id"},
-        // player2:{firstname: "fname2", lastname: "lname2", team: "team2", playerId: "p2Id"},
-        // player3:{firstname: "fname3", lastname: "lname3", team: "team3", playerId: "p3Id"},
-        // player4:{firstname: "fname4", lastname: "lname4", team: "team4", playerId: "p4Id"},
-        // player5:{firstname: "fname5", lastname: "lname5", team: "team5", playerId: "p5Id"},
-        // player6:{firstname: "fname6", lastname: "lname6", team: "team6", playerId: "p6Id"}    
-        // }});
-        var obj = this;
+
         function setState(data){
             console.log(data.query);
             obj.setState({results: data.query});
@@ -66,7 +57,7 @@ class SearchBar extends Component {
         
         console.log("retrieving: " + input);
         // localhost:8000/retrieve_data
-        fetch('http://127.0.0.1:8000/search/?player_name=' + input, {
+        fetch('http://127.0.0.1:8000/player_search/?player_name=' + input, {
             mode: 'cors',
             method: 'GET',
             headers: {
@@ -109,7 +100,7 @@ class SearchBar extends Component {
                         ></input>
 
                     <div className={classNames.wrapperModal}>
-                        {Object.keys(this.state.results).map((key, index) => 
+                        {Object.keys(this.state.results).map((key, index) =>
                         <SearchResult
                             key = {index}
                             personId = {this.state.results[key].personId}

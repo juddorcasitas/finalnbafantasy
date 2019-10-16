@@ -39,6 +39,6 @@ class connections(object):
                         cls.conn.insert_one(db, collection, query)
 
         @classmethod
-        def find(cls, db, collection, query):
+        def find(cls, db, collection, query, applyFilter = {}):
                 if cls.isConnected():
-                        return cls.conn.find(db, collection, query)
+                        return cls.conn.find(db, collection, query, applyFilter)

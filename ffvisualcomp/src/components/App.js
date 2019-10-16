@@ -37,9 +37,7 @@ class AppMain extends Component{
           <Route exact path="/">
             <LandingTemp />
           </Route>
-          <Route path="/player-profile">
-            <PlayerProfile/>
-          </Route>
+          <Route path="/player-profile/:playerURL?" component={PlayerProfile}/>
         </Switch>
 
       </Router>
