@@ -1,5 +1,4 @@
 .App {
-  text-align: center;
 }
 
 .App-logo {
@@ -8,10 +7,6 @@
 
 .App-header {
   min-height: 5vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
 }
@@ -21,5 +16,13 @@
 }
 
 .Main{
-  padding: 10%;
+  padding: 5%;
+}
+
+th{
+  text-align: left;
+}
+
+td{
+  text-align: left;
 }

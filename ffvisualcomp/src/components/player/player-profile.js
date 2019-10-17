@@ -1,73 +1,123 @@
-import React, {Component} from 'react'
+import React, {useState, useEffect} from 'react'
 import classNames from '../utils/class-css'
 import SearchBar from '../search/search'
 import {
-    useParams,
-    useRouteMatch
+    useParams
 } from 'react-router-dom'
 
-function LoadProfile(props){
-    let {path, url} = useRouteMatch();
-    let {playerURL} = useParams();
-    console.log(path, url);
-    if (playerURL){
-        console.log(playerURL);
-        props.onLoad(playerURL);
-    }
-    // let fetchPlayerInfo = function(){
-    //     console.log("retrieving: " + props.personId);
-    //     // localhost:8000/retrieve_data
-    //     fetch('http://localhost:8000/retrieve_data')
-    //     .then(response => response.json())
-    //     .then(data =>{
-    //         console.log("data returned: " + data);
-    //         this.setState({
-    //             playerInfo: data,
-    //             isLoading: false,
-    //         });
-        
-    //     })
-    //     .catch(error => this.setState({error, isLoading:false}));
-    // }
-
-    // fetchPlayerInfo();
+function ReturnDefault(props){
     return(<div>
-    </div>)
-
-
+        <h3>Search for a player</h3>
+    </div>);
 }
 
-class PlayerProfile extends Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            playerInfo: {},
-            isLoading: true,
-            error: null
+function PlayerDataTable(props){
+    const [playerInfo, setPlayerInfo] = useState({});
+    console.log(props.url);
+    let personId = props.url.split('_')[0];
+    useEffect(() => {
+        fetch('http://localhost:8000/retrieve_player_info/?personId=' + personId,{
+        mode: 'cors',
+        method: 'GET',
+        headers: {
+            "content-type": "application/json",
+          },
+    }).then(
+        function(response) {
+            // console.log(response.body.json());
+          if (response.status !== 200) {
+            console.log('Looks like there was a problem. Status Code: ' +
+              response.status);
+            return;
+          }
+          // Response is OK cont..
+          return response.json();
         }
-    }
+      ).then(function(data) {
+        // console.log(data);
+        setPlayerInfo(data['query']);
+      })
+      .catch(function(err) {
+        console.log('Fetch Error :-S', err);
+      });
+      }, [personId]);
+    
+    return(
+        <div>
+       <table>
+           <tbody>
+           {Object.keys(playerInfo).filter(key => key.toString() !== "Draft" 
+                            && key.toString() !== "Teams" && key.toString() !== "Current Team")
+                            .map((key, index) =>
+                            <tr key={index}>
+                                <th>
+                                    {key.toString()}
+                                </th>
+                                <td>
+                                    {playerInfo[key]}
+                                </td>
+                            </tr>
+                        )}
+            </tbody>
+        </table>
+        <table>
+            <tbody>
+                <tr>
+                    <th>Drafted</th>
+                    <th>Pick #</th>
+                    <th>Round #</th>
+                    <th>Year</th>
+                </tr>
+                {Object.keys(playerInfo).filter(key => key.toString() === "Draft")
+                    .map((key,index) => 
+                    <tr key={index}>
+                        {playerInfo[key].map((x, i) => <td key={i}>{x}</td> )}
+                    </tr>
+                    )}
+            </tbody>
+        </table>
+        <table>
+            <tbody>
+                <tr>
+                    <th>Team History</th>
+                    <th>From</th>
+                    <th>To</th>
+                </tr>
+                </tbody>
+                {Object.keys(playerInfo).filter(key => key.toString() === "Teams")
+                    .map((key,index) =>
+                    <tbody key={index}>
+                        {playerInfo[key].map((x, i) => 
+                        <tr key={i}>
+                            {x.map((val, indx) => 
+                            <td key={indx}>
+                            {val}
+                            </td>)}
+                        </tr> )}
+                    </tbody>
+                    )}
+        </table>
+        </div>
+   );
+}
 
-    handleSearchResultsOnClick = (e, data, func) => {
-        console.log("You clicked on: " + data.personId);
-    }
+function PlayerProfile(props){
+    let {playerURL} = useParams();
 
-    updatePlayerData(data){
-        console.log(data);
-    }
-
-    render(){
-        return(
+    if (playerURL){
+        return (
             <div className={classNames.wrapperLarge}>
                 <h1>Find Player stats</h1>
-                <SearchBar 
-                resultsOnClick={
-                    (e, data, func) => this
-                    .handleSearchResultsOnClick(e, data, func)}>
-                </SearchBar>
-                <LoadProfile onLoad={data => this.updatePlayerData(data)}></LoadProfile>
-            </div>
-        );
+                <SearchBar></SearchBar>
+                <PlayerDataTable url={playerURL}/>
+            </div>);
     }
+    return (
+    <div className={classNames.wrapperLarge}>
+        <h1>Find Player stats</h1>
+        <SearchBar></SearchBar>
+        <ReturnDefault/>
+    </div>);
 }
 
 export default PlayerProfile;

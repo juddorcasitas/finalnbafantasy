@@ -18,13 +18,13 @@ def player_search(request):
                                  '$options':'i' 
                                 } 
                             } 
-                        ] 
-            }
+                        ]}
     applyFilter = {
                 "_id": 0, 
                 "firstName": 1, 
                 "lastName": 1, 
                 "personId": 1, 
+                "teamId": 1,
                 "teamSitesOnly.playerCode": 1}
     
     print(query) #debug
@@ -32,7 +32,8 @@ def player_search(request):
     #query = {}
     found_list = []
     try:
-        data = connections.find("player_data_db","player_data",query, applyFilter).sort([('firstName', pymongo.ASCENDING), ('lastName', pymongo.ASCENDING)])
+        data = connections.find("player_data_db","player_data",query, applyFilter)\
+            .sort([('firstName', pymongo.ASCENDING), ('lastName', pymongo.ASCENDING)])
         print(data) #debug
         for i in data:
             found_list.append(i)
@@ -46,26 +47,48 @@ def player_search(request):
     return res
 
 # WIP
-def retreive_player_data(request):
+def retreive_player_info(request):
     print("Hello from search") #debug
-    print("") #debug
-    player_name = request.GET['personId']
-    query ={'personId'}
+    personId = request.GET['personId']
+    query ={
+        'personId': "{}".format(personId)}
     print(query) #debug
     print("is Connected: {}".format(connections.isConnected())) #debug
     #query = {}
-    data = connections.find("player_data_db","player_data",query).sort([('firstName', pymongo.ASCENDING), ('lastName', pymongo.ASCENDING)])
+    applyFilter = {
+                "_id": 0}
+    try:
+        data = connections.find("player_data_db","player_data",query, applyFilter)
+    except Exception as exc:
+        print("Mongo Query failed: ")
+        print(exc)
+    
     print(data) #debug
     print(type(data)) #debug
-    found_list = []
-    for i in data:
-        del i['_id']
-        found_list.append(i)
-    print(len(found_list))
-    print(found_list)
-    res = {"query": found_list}
-    res = HttpResponse(json.dumps(res), content_type='application/json')
+    res = {"query": "No Info"}
+
+    def getTeamAsList(i):
+        return [v for k,v in i.items()]
+
+    if data:
+        # Curate for readability
+        query = data[0]
+        res = {"query": {
+            "Full Name": "{} {}".format(query["firstName"], query["lastName"]),
+            "Current Team": query['teamId'],
+            "Position": query['teamSitesOnly']['posFull'],
+            "Height": "{}\'{}({}m)".format(query['heightFeet'], query['heightInches'], query['heightMeters']),
+            "Weight": "{}kg({}lbs)".format(query['weightKilograms'], query['weightPounds']),
+            "Date of Birth": "{}".format(query['dateOfBirthUTC']),
+            "Years Pro": query['yearsPro'],
+            "NBA debut": query['nbaDebutYear'],
+            "College": query['collegeName'],
+            "Affiliation": query['lastAffiliation'],
+            "Draft": [v for k,v in query['draft'].items()],
+            "Teams": [getTeamAsList(i) for i in query['teams']]
+        }}
     print(res)
+    res = HttpResponse(json.dumps(res), content_type='application/json')
     return res
 
 def retreive_game_data(request):

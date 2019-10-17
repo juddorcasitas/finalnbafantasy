@@ -2,11 +2,8 @@ import React, {Component} from "react"
 import classNames from '../utils/class-css'
 import {
     Link,
-    useRouteMatch
 } from 'react-router-dom'
 import _ from 'lodash'
-
-// const playerAPI = 'https://';
 
 function SearchResult(props){
     let playerURL = props.personId + "_"+props.playercode ;
@@ -16,8 +13,8 @@ function SearchResult(props){
     onClick={props.onClick}>
             <Link to={`/player-profile/${playerURL}`}>
                 <p>
-                    <span>{props.firstname}</span>
-                    <span>{props.lastname}</span>
+                    <span>{props.firstname}&nbsp;</span>
+                    <span>{props.lastname}&nbsp;</span>
                     <span>{props.team}</span>
                 </p>
             </Link>
@@ -40,7 +37,6 @@ class SearchBar extends Component {
         this.setState({value: input});
         this.getSearchquery(input);
     }
-
 
     getSearchquery = (input) =>{
         var obj = this;
@@ -85,6 +81,10 @@ class SearchBar extends Component {
 
     }
 
+    handleClick(){
+        this.setState({value: '', results: {}});
+    }
+
     render () {
         return (
             <div className={classNames.wrapperLarge}>
@@ -108,11 +108,7 @@ class SearchBar extends Component {
                             lastname = {this.state.results[key].lastName}
                             team = {this.state.results[key].teamId}
                             playercode ={this.state.results[key].teamSitesOnly.playerCode}
-                            onClick = {(e) => this.props
-                                .resultsOnClick(
-                                    e, 
-                                    this.state.results[key],
-                                    this.setState({value: '', results: {}}))}
+                            onClick = {(e) => this.handleClick(e)}
                         />)}
                     </div>
                 </div>
