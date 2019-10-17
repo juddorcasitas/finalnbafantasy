@@ -13,10 +13,10 @@ function ReturnDefault(props){
     </div>);
 }
 
-function BuildGraph(playerInfo)
+function BuildGraph(props)
 {
   console.log("Hello from build graph") //debug
-  console.log(playerInfo)
+  console.log(props.pInfo) //asuming I would get the player games here
 var d3 = require("d3");
 
 // set the dimensions and margins of the graph
@@ -32,10 +32,12 @@ var svg = d3.select("#my_dataviz")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
 //Read the data
-d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/connectedscatter.csv",
-  // When reading the csv, I must format variables:
+d3.json(props.pInfo,
+  // When reading the json, I must format variables:
   function(d){
-    return { date : d3.timeParse("%Y-%m-%d")(d.date), value : d.value }
+    console.log(d);
+    return 0
+    //return { date : d3.timeParse("%Y-%m-%d")(d.date), value : d.value }
   },
   // Now I can use this dataset:
   function(data) {
@@ -99,8 +101,14 @@ function PlayerDataTable(props){
           return response.json();
         }
       ).then(function(data) {
-        //console.log(data);
+        console.log(data['query']);
         setPlayerInfo(data['query']);
+        return (
+          <div>
+          <p>Hello From Graphs</p>
+          <BuildGraph pInfo={playerInfo}/> 
+          </div>
+        ); // trying to build a graph with the infomation 
       })
       .catch(function(err) {
         console.log('Fetch Error :-S', err);
@@ -108,13 +116,12 @@ function PlayerDataTable(props){
       }, [player_route]);
     
     return(
-      
-        <div>
-       <p>Hello From Graphs</p>
-       <div id="my_dataviz"></div>
-       <BuildGraph date={playerInfo} ></BuildGraph>
-       </div>
-   );
+      <div>
+      <p>Hello From Graphs</p>
+      <BuildGraph pInfo={playerInfo}/> 
+      </div>
+
+   );  // trying to build a graph with the infomation 
 }
 
 function GraphCanvas(props){
