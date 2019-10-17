@@ -91,21 +91,37 @@ def retreive_player_info(request):
     res = HttpResponse(json.dumps(res), content_type='application/json')
     return res
 
-def retreive_game_data(request):
-    print("Hello from retreive_data") #debug
-    person_id = request.GET['personId']
-    player_code = request.GET['playerCode']
-    day = int(request.GET['day'])
-    month = int(request.GET['month'])
-    year = int(request.GET['year'])
-    collection_id = "player_"+person_id+"_"+player_code
+def retreive_graph_data(request):
+    print("Hello from retreive_graph_data") #debug
+    player_route = request.GET['player_route']
+    collection_id = "player_"+player_route
+    print("Col ID: {}".format(collection_id))
+    year = 2018
+    month = 8
+    day = 21
     end = datetime.now()
     start = datetime(year,month,day)
     print("is Connected: {}".format(connections.isConnected())) #debug
     print(collection_id )
     query = {'GAME_DATE': {'$lt': end, '$gte': start}}
-    data = connections.find("player_game_db",collection_id,query)
-    return HttpResponse(data, content_type='application/json')
+    applyFilter = { "Player_ID" : 1, "Game_ID" : 1, "GAME_DATE" : 1, "MATCHUP" :1, "WL" : 1, "MIN" : 1, "FGM" : 1, "FGA" : 1, "FG_PCT" : 1, "FG3M" : 1, "FG3A" : 1, "FG3_PCT" : 1, "FTM" : 1, "FTA" : 1, "FT_PCT" : 1, "OREB" : 1, "DREB" : 1, "REB" : 1, "AST" : 1, "STL" : 1, "BLK" : 1, "TOV" : 1, "PF" : 1, "PTS" : 1, "PLUS_MINUS" : 1}
+    try:
+        data = connections.find("player_game_db",collection_id,query, applyFilter)
+    except Exception as exc:
+        print("Mongo Query failed: ")
+        print(exc)
+
+    if data:
+        # Curate for readability
+        gamelist = []
+        for game in data:
+            del game['_id']
+            game['GAME_DATE'] = game['GAME_DATE'].strftime("%m/%d/%Y")
+            gamelist.append(game)
+        res = {"query": gamelist}
+    print(res)
+    res = HttpResponse(json.dumps(res), content_type='application/json')    
+    return res
             
 def load_player_data(request):
     import os

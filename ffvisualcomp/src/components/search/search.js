@@ -7,11 +7,13 @@ import _ from 'lodash'
 
 function SearchResult(props){
     let playerURL = props.personId + "_"+props.playercode ;
+    const myURL = window.location.href.split('/')[3]; // Code to get route of current pange to for player profile and graph
+    console.log(myURL);
     return(
     <div 
     className={classNames.searchPlayerRow}
     onClick={props.onClick}>
-            <Link to={`/player-profile/${playerURL}`}>
+            <Link to={`/${myURL}/${playerURL}`}>
                 <p>
                     <span>{props.firstname}&nbsp;</span>
                     <span>{props.lastname}&nbsp;</span>

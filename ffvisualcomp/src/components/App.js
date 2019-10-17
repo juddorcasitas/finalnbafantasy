@@ -7,6 +7,7 @@ import {
 } from "react-router-dom"
 import LandingTemp from './landing/landing_page'
 import PlayerProfile from './player/player-profile'
+import GraphCanvas from './player/player-graph'
 import classNames from '../components/utils/class-css'
 
 import '../assets/App.css';
@@ -30,6 +31,9 @@ class AppMain extends Component{
             <li>
               <Link to="/login">Sign Up</Link>
             </li>
+            <li>
+              <Link to="/player-graph">Graphs</Link>
+            </li>
           </ul>
         </div>
 
@@ -38,6 +42,7 @@ class AppMain extends Component{
             <LandingTemp />
           </Route>
           <Route path="/player-profile/:playerURL?" component={PlayerProfile}/>
+          <Route path="/player-graph/:playerURL?" component={GraphCanvas}/>
         </Switch>
 
       </Router>
