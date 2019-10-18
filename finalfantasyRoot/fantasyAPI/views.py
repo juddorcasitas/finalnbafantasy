@@ -106,7 +106,7 @@ def retreive_graph_data(request):
     query = {'GAME_DATE': {'$lt': end, '$gte': start}}
     applyFilter = { "Player_ID" : 1, "Game_ID" : 1, "GAME_DATE" : 1, "MATCHUP" :1, "WL" : 1, "MIN" : 1, "FGM" : 1, "FGA" : 1, "FG_PCT" : 1, "FG3M" : 1, "FG3A" : 1, "FG3_PCT" : 1, "FTM" : 1, "FTA" : 1, "FT_PCT" : 1, "OREB" : 1, "DREB" : 1, "REB" : 1, "AST" : 1, "STL" : 1, "BLK" : 1, "TOV" : 1, "PF" : 1, "PTS" : 1, "PLUS_MINUS" : 1}
     try:
-        data = connections.find("player_game_db",collection_id,query, applyFilter)
+        data = connections.find("player_game_db",collection_id,query, applyFilter).sort([('GAME_DATE', pymongo.DESCENDING)])
     except Exception as exc:
         print("Mongo Query failed: ")
         print(exc)
@@ -116,7 +116,7 @@ def retreive_graph_data(request):
         gamelist = []
         for game in data:
             del game['_id']
-            game['GAME_DATE'] = game['GAME_DATE'].strftime("%m/%d/%Y")
+            game['GAME_DATE'] = game['GAME_DATE'].strftime("%d/%m/%Y")
             gamelist.append(game)
         res = {"query": gamelist}
     print(res)
