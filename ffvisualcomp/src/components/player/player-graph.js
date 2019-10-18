@@ -4,8 +4,7 @@ import SearchBar from '../search/search'
 import {
     useParams
 } from 'react-router-dom'
-
-
+import * as d3 from "d3";
 
 function ReturnDefault(props){
     return(<div>
@@ -13,69 +12,102 @@ function ReturnDefault(props){
     </div>);
 }
 
+function addStyle(styles) { 
+              
+  /* Create style element */ 
+  var css = document.createElement('style'); 
+  css.type = 'text/css'; 
+
+  if (css.styleSheet)  
+      css.styleSheet.cssText = styles; 
+  else  
+      css.appendChild(document.createTextNode(styles)); 
+    
+  /* Append style to the head element */ 
+  document.getElementsByTagName("head")[0].appendChild(css); 
+} 
+
 function BuildGraph(props)
 {
+  /* Declare the style element */ 
+  var styles = 'body { font: 12px Arial;} '; 
+  styles += ' path { stroke: steelblue; stroke-width: 2; fill: none;}'; 
+  styles += '.axis path, .axis line { fill: none; stroke: grey; stroke-width: 1; shape-rendering: crispEdges; }'; 
+    
+  /* Function call */ 
+  window.onload = function() { addStyle(styles) }; 
   console.log("Hello from build graph") //debug
-  console.log(props.pInfo) //asuming I would get the player games here
-var d3 = require("d3");
+  console.log(props) //asuming I would get the player games here
+// Set the dimensions of the canvas / graph
+var margin = {top: 60, right: 40, bottom: 40, left: 50},
+    width = 600 - margin.left - margin.right,
+    height = 270 - margin.top - margin.bottom;
 
-// set the dimensions and margins of the graph
-var margin = {top: 10, right: 30, bottom: 30, left: 60},
-    width = 460 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
-// append the svg object to the body of the page
-var svg = d3.select("#my_dataviz")
-  .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
-//Read the data
-d3.json(props.pInfo,
-  // When reading the json, I must format variables:
-  function(d){
-    console.log(d);
-    return 0
-    //return { date : d3.timeParse("%Y-%m-%d")(d.date), value : d.value }
-  },
-  // Now I can use this dataset:
-  function(data) {
-    // Add X axis --> it is a date format
-    var x = d3.scaleTime()
-      .domain(d3.extent(data, function(d) { return d.date; }))
-      .range([ 0, width ]);
-    svg.append("g")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
-    // Add Y axis
-    var y = d3.scaleLinear()
-      .domain( [8000, 9200])
-      .range([ height, 0 ]);
-    svg.append("g")
-      .call(d3.axisLeft(y));
-    // Add the line
-    svg.append("path")
-      .datum(data)
-      .attr("fill", "none")
-      .attr("stroke", "#69b3a2")
-      .attr("stroke-width", 1.5)
-      .attr("d", d3.line()
-        .x(function(d) { return x(d.date) })
-        .y(function(d) { return y(d.value) })
-        )
-    // Add the points
-    svg
-      .append("g")
-      .selectAll("dot")
-      .data(data)
-      .enter()
-      .append("circle")
-        .attr("cx", function(d) { return x(d.date) } )
-        .attr("cy", function(d) { return y(d.value) } )
-        .attr("r", 5)
-        .attr("fill", "#69b3a2")
-})
+// Parse the date / time
+var parseDate = d3.time.format("%d/%m/%Y").parse; // this isnt working ???
+
+// Set the ranges
+var x = d3.time.scale().range([0, width]);
+var y = d3.scale.linear().range([height, 0]);
+
+// Define the axes
+var xAxis = d3.svg.axis().scale(x)
+    .orient("bottom").ticks(5);
+
+var yAxis = d3.svg.axis().scale(y)
+    .orient("left").ticks(5);
+
+// Define the line
+var valueline = d3.svg.line()
+    .x(function(d) { return x(d.GAME_DATE); })
+    .y(function(d) { return y(d.PTS); });
+    
+// Adds the svg canvas
+var svg = d3.select("body")
+    .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform", 
+              "translate(" + margin.left + "," + margin.top + ")");
+
+// Get the data
+
+  console.log(typeof(props.query))
+
+  var data = props.query
+  data.forEach(function(d) {
+    d.GAME_DATE = parseDate(d.GAME_DATE);
+});
+
+// Scale the range of the data
+x.domain(d3.extent(data, function(d) { return d.GAME_DATE; }));
+y.domain([0, d3.max(data, function(d) { return d.PTS; })]);
+
+// Add the valueline path.
+svg.append("path")
+    .attr("class", "line")
+    .attr("d", valueline(data));
+
+// Add the scatterplot
+svg.selectAll("dot")
+    .data(data)
+  .enter().append("circle")
+    .attr("r", 3.5)
+    .attr("cx", function(d) { return x(d.GAME_DATE); })
+    .attr("cy", function(d) { return y(d.PTS); });
+
+// Add the X Axis
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis);
+
+// Add the Y Axis
+svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxis);
+
 }
 
 function PlayerDataTable(props){
@@ -101,26 +133,22 @@ function PlayerDataTable(props){
           return response.json();
         }
       ).then(function(data) {
-        console.log(data['query']);
+        //console.log(data['query']);
+        var graphData = data;
         setPlayerInfo(data['query']);
-        return (
-          <div>
-          <p>Hello From Graphs</p>
-          <BuildGraph pInfo={playerInfo}/> 
-          </div>
-        ); // trying to build a graph with the infomation 
+        console.log(graphData);
+        return BuildGraph(graphData);
       })
       .catch(function(err) {
         console.log('Fetch Error :-S', err);
       });
       }, [player_route]);
-    
     return(
       <div>
       <p>Hello From Graphs</p>
-      <BuildGraph pInfo={playerInfo}/> 
+      <div id="my_dataviz"></div>
+    
       </div>
-
    );  // trying to build a graph with the infomation 
 }
 
