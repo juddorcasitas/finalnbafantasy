@@ -1,6 +1,10 @@
 .App {
 }
 
+.MuiBackdrop-root{
+  opacity: 0 !important; 
+}
+
 .App-logo {
   height: 10vmin;
 }

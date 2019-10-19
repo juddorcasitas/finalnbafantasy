@@ -42,6 +42,11 @@ def player_search(request):
         print("Mongo Query failed: ")
         print(exc)
 
+    # limit return
+    lisLen = len(found_list)
+    if (lisLen > 15):
+        found_list = found_list[:15]
+
     res = {"query": found_list}
     res = HttpResponse(json.dumps(res), content_type='application/json')
     return res
