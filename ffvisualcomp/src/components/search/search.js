@@ -14,14 +14,13 @@ function SearchResult(props){
     className={classNames.searchPlayerRow}
     onClick={props.onClick}>
             <Link to={`/${myURL}/${playerURL}`}>
-                <span>
-                <img height="40" width="45" src={props.headshotURL} onError={(e)=>{e.target.onerror = null; e.target.src="http://localhost:8000/media/player_headshots/default.png"}}></img>
                 <p>
+                    <span><img height="40" width="54" src={props.headshotURL} alt="Player" onError={(e)=>{e.target.onerror = null; e.target.src="http://localhost:8000/media/player_headshots/default.png"}}></img></span>
                     <span>{props.firstname}&nbsp;</span>
                     <span>{props.lastname}&nbsp;</span>
                     <span>{props.team}</span>
                 </p>
-                </span>
+           
             </Link>
     </div>)
 }

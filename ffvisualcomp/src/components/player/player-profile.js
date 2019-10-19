@@ -46,7 +46,7 @@ function PlayerDataTable(props){
         <div>
         <div>
             {Object.keys(playerInfo).filter(key => key.toString() === "headshotURL")
-                .map((key, index) => <img key={playerInfo["headshotURL"]} src={playerInfo["headshotURL"]} alt="Player"
+                .map((key, index) => <img height="190" width="260" key={playerInfo["headshotURL"]} src={playerInfo["headshotURL"]} alt="Player"
                 onError={(e)=>{e.target.onerror = null; e.target.src="http://localhost:8000/media/player_headshots/default.png"}}></img>
                 )}
         </div>

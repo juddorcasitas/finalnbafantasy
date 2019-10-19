@@ -14,7 +14,6 @@ import PlayerProfile from './player/player-profile'
 import GraphCanvas from './player/player-graph'
 import classNames from '../components/utils/class-css'
 import '../assets/App.css'
-import { Menu } from '@material-ui/core';
 
 class AppMain extends Component{
 
