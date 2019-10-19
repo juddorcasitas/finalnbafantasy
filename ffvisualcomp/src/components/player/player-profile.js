@@ -44,10 +44,18 @@ function PlayerDataTable(props){
     
     return(
         <div>
+        <div>
+            {Object.keys(playerInfo).filter(key => key.toString() === "headshotURL")
+                .map((key, index) => <img key={playerInfo["headshotURL"]} src={playerInfo["headshotURL"]} alt="Player"
+                onError={(e)=>{e.target.onerror = null; e.target.src="http://localhost:8000/media/player_headshots/default.png"}}></img>
+                )}
+        </div>
        <table>
            <tbody>
            {Object.keys(playerInfo).filter(key => key.toString() !== "Draft" 
-                            && key.toString() !== "Teams" && key.toString() !== "Current Team")
+                            && key.toString() !== "Teams" 
+                            && key.toString() !== "Current Team"
+                            && key.toString() !== "headshotURL")
                             .map((key, index) =>
                             <tr key={index}>
                                 <th>

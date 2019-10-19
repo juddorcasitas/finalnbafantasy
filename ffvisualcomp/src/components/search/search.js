@@ -7,16 +7,21 @@ import _ from 'lodash'
 
 function SearchResult(props){
     let playerURL = props.personId + "_"+props.playercode ;
+    const myURL = window.location.href.split('/')[3]; // Code to get route of current pange to for player profile and graph
+    console.log(myURL);
     return(
     <div 
     className={classNames.searchPlayerRow}
     onClick={props.onClick}>
-            <Link to={`/player-profile/${playerURL}`}>
+            <Link to={`/${myURL}/${playerURL}`}>
+                <span>
+                <img height="40" width="45" src={props.headshotURL} onError={(e)=>{e.target.onerror = null; e.target.src="http://localhost:8000/media/player_headshots/default.png"}}></img>
                 <p>
                     <span>{props.firstname}&nbsp;</span>
                     <span>{props.lastname}&nbsp;</span>
                     <span>{props.team}</span>
                 </p>
+                </span>
             </Link>
     </div>)
 }
@@ -103,6 +108,7 @@ class SearchBar extends Component {
                         {Object.keys(this.state.results).map((key, index) =>
                         <SearchResult
                             key = {index}
+                            headshotURL = {this.state.results[key].headshotURL}
                             personId = {this.state.results[key].personId}
                             firstname = {this.state.results[key].firstName}
                             lastname = {this.state.results[key].lastName}

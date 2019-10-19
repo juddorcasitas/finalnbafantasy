@@ -5,6 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^4.5.1",
     "lodash.chunk": "^4.2.0",
+    "package.json": "^2.0.1",
     "react": "^16.10.2",
     "react-d3-library": "^1.1.8",
     "react-dom": "^16.10.2",

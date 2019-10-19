@@ -11,6 +11,7 @@ import {
 } from "react-router-dom"
 import LandingTemp from './landing/landing_page'
 import PlayerProfile from './player/player-profile'
+import GraphCanvas from './player/player-graph'
 import classNames from '../components/utils/class-css'
 import '../assets/App.css'
 import { Menu } from '@material-ui/core';
@@ -52,11 +53,14 @@ class AppMain extends Component{
           <MenuItem component={Link} to="/player-profile">Player Statistics</MenuItem>
           <MenuItem component={Link} to="/team-builder">Create a Team</MenuItem>
           <MenuItem component={Link} to="/login">Sign Up</MenuItem>
+          <MenuItem component={Link} to="/player-graph">Graphs</MenuItem>
+
         </Drawer>
         <Switch>
           <Route exact path="/" component={LandingTemp}>
             </Route>
           <Route path="/player-profile/:playerURL?" component={PlayerProfile}/>
+          <Route path="/player-graph/:playerURL?" component={GraphCanvas}/>
         </Switch>
       </Router>
       </div>

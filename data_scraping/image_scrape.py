@@ -14,7 +14,7 @@ for i in range(player_list_len):
     print("{}/{}".format(i,player_list_len))
     print("Player_ID: {}".format(playerList[i]["personId"]))
     try:
-        folder_name = playerList[i]["personId"]+"_"+playerList[i]['teamSitesOnly']['playerCode']
+        folder_name = 'player_headshots' #playerList[i]["personId"]+"_"+playerList[i]['teamSitesOnly']['playerCode']
 
         r = requests.get(image_url.format(playerList[i]["personId"]), stream=True)
         with open(folder_name+"/"+'{}.png'.format(playerList[i]["personId"]), 'wb') as out_file:
@@ -22,4 +22,4 @@ for i in range(player_list_len):
         del r
     except:
         continue
-    sleep(1)
+   # sleep(1)
