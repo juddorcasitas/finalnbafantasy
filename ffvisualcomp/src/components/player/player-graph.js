@@ -27,87 +27,132 @@ function addStyle(styles) {
   document.getElementsByTagName("head")[0].appendChild(css); 
 } 
 
+
 function BuildGraph(props)
 {
-  /* Declare the style element */ 
-  var styles = 'body { font: 12px Arial;} '; 
-  styles += ' path { stroke: steelblue; stroke-width: 2; fill: none;}'; 
-  styles += '.axis path, .axis line { fill: none; stroke: grey; stroke-width: 1; shape-rendering: crispEdges; }'; 
-    
-  /* Function call */ 
-  window.onload = function() { addStyle(styles) }; 
-  console.log("Hello from build graph") //debug
-  console.log(props) //asuming I would get the player games here
-// Set the dimensions of the canvas / graph
-var margin = {top: 60, right: 40, bottom: 40, left: 50},
-    width = 600 - margin.left - margin.right,
-    height = 270 - margin.top - margin.bottom;
 
-// Parse the date / time
-var parseDate = d3.time.format("%d/%m/%Y").parse; // this isnt working ???
+      // List of groups (here I have one group per column)
+  var allGroup = ["PTS", "AST", "BLK","DREB",'WL','TOV','REB']
 
-// Set the ranges
-var x = d3.time.scale().range([0, width]);
-var y = d3.scale.linear().range([height, 0]);
+    // add the options to the button
+    d3.select("#selectButton")
+      .selectAll('myOptions')
+     	.data(allGroup)
+      .enter()
+    	.append('option')
+      .text(function (d) { return d; }) // text showed in the menu
+      .attr("value", function (d) { return d; }) // corresponding value returned by the button
+  // set the dimensions and margins of the graph
+var margin = {top: 10, right: 30, bottom: 30, left: 60},
+width = 8000 - margin.left - margin.right,
+height = 400 - margin.top - margin.bottom;
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+.append("svg")
+.attr("width", width + margin.left + margin.right)
+.attr("height", height + margin.top + margin.bottom)
+.append("g")
+.attr("transform",
+      "translate(" + margin.left + "," + margin.top + ")");
 
-// Define the axes
-var xAxis = d3.svg.axis().scale(x)
-    .orient("bottom").ticks(5);
+      // Parse the date / time
+var parseDate = d3.timeParse("%d/%m/%Y"); // this isnt working ???
 
-var yAxis = d3.svg.axis().scale(y)
-    .orient("left").ticks(5);
 
-// Define the line
-var valueline = d3.svg.line()
-    .x(function(d) { return x(d.GAME_DATE); })
-    .y(function(d) { return y(d.PTS); });
-    
-// Adds the svg canvas
-var svg = d3.select("body")
-    .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-        .attr("transform", 
-              "translate(" + margin.left + "," + margin.top + ")");
+var data = props.query
+data.forEach(function(d) {
+  d.GAME_DATE = parseDate(d.GAME_DATE);
+})
+  // Now I can use this dataset:
+  
 
-// Get the data
-
-  console.log(typeof(props.query))
-
-  var data = props.query
-  data.forEach(function(d) {
-    d.GAME_DATE = parseDate(d.GAME_DATE);
-});
-
-// Scale the range of the data
-x.domain(d3.extent(data, function(d) { return d.GAME_DATE; }));
-y.domain([0, d3.max(data, function(d) { return d.PTS; })]);
-
-// Add the valueline path.
-svg.append("path")
-    .attr("class", "line")
-    .attr("d", valueline(data));
-
-// Add the scatterplot
-svg.selectAll("dot")
-    .data(data)
-  .enter().append("circle")
-    .attr("r", 3.5)
-    .attr("cx", function(d) { return x(d.GAME_DATE); })
-    .attr("cy", function(d) { return y(d.PTS); });
-
-// Add the X Axis
-svg.append("g")
-    .attr("class", "x axis")
+  var x = d3.scaleTime()
+  .domain(d3.extent(data, function(d) { return d.GAME_DATE; }))
+  .range([ 0, width ]);
+  var y = d3.scaleLinear()
+  .domain(d3.extent(data, function(d) { return d.PTS; }))
+  .range([ height, 0 ]);
+  
+    svg.append("g")
     .attr("transform", "translate(0," + height + ")")
-    .call(xAxis);
+    .call(d3.axisBottom(x));
 
-// Add the Y Axis
-svg.append("g")
-    .attr("class", "y axis")
-    .call(yAxis);
+    svg.append("g")
+    .call(d3.axisLeft(y));
+    // Add the line     
+    var line = svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "#69b3a2")
+      .attr("stroke-width", 1.5)
+      .attr("d", d3.line()
+        .x(function(d) { return x(d.GAME_DATE) })
+        .y(function(d) { return y(d.PTS) })
+        )
+    // Add the points
+    var dot = svg
+      .append("g")
+      .selectAll("dot")
+      .data(data)
+      .enter()
+      .append("circle")
+        .attr("cx", function(d) { return x(d.GAME_DATE) } )
+        .attr("cy", function(d) { return y(d.PTS) } )
+        .attr("r", 5)
+        .attr("fill", "#000000")
 
+         // A function that update the chart
+    function update(selectedGroup) {
+
+      // Create new data with the selection?
+      var dataFilter = data.map(function(d){return {time: d.GAME_DATE, value:d[selectedGroup]} })
+      //console.log(dataFilter);
+
+      var y = d3.scaleLinear()
+      .domain(d3.extent(dataFilter, function(d) { return d.value; }))
+      .range([ height, 0 ]);
+
+      var t = d3.transition()
+      .duration(500)
+
+         
+        svg.select(".y")
+            .transition(t)
+            .call(d3.axisLeft(y))
+      // Give these new data to update line
+      line
+          .datum(dataFilter)
+          .transition()
+          .duration(1000)
+          .attr("d", d3.line()
+            .x(function(d) { return x(d.time) })
+            .y(function(d) { return y(d.value) })
+          )
+      dot
+        .data(dataFilter)
+        .transition()
+        .duration(1000)
+          .attr("cx", function(d) { return x(d.time) })
+          .attr("cy", function(d) { return y(d.value) })
+
+          var y2 = svg.selectAll(".y")
+          .data(dataFilter.value)
+          
+      var newY = y2.enter().append("g")
+          .attr("class", "y axis")
+          .attr("transform", "translate("+[margin.left, margin.top]+")")
+
+          y2.merge(newY).transition(t).call(y)
+
+    }
+
+    // When the button is changed, run the updateChart function
+    d3.select("#selectButton").on("change", function(d) {
+        // recover the option that has been chosen
+        var selectedOption = d3.select(this).property("value")
+        // run the updateChart function with this selected option
+        return update(selectedOption);
+    })
 }
 
 function PlayerDataTable(props){
@@ -146,8 +191,8 @@ function PlayerDataTable(props){
     return(
       <div>
       <p>Hello From Graphs</p>
+      <select id="selectButton"></select>
       <div id="my_dataviz"></div>
-    
       </div>
    );  // trying to build a graph with the infomation 
 }
