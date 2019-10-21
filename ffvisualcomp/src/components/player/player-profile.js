@@ -4,6 +4,7 @@ import SearchBar from '../search/search'
 import {
     useParams
 } from 'react-router-dom'
+import FindNBAteam from '../utils/NBAteams'
 
 function ReturnDefault(props){
     return(<div>
