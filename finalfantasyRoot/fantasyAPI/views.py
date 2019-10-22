@@ -135,7 +135,7 @@ def retreive_graph_data(request):
 def load_player_data(request):
     import os
     import json
-    filepath = '/Users/judd/VscodeProjects/finalfantasy/data_scraping/player_data_folder' #right click and use 'copyfull path' as paste here
+    filepath = '/home/tomi/Sandbox/ffdata/player_data_folder' #right click and use 'copyfull path' as paste here
     print("Hello from load_player_data") #debug
     print("is Connected: {}".format(connections.isConnected())) #debug
     filename = "player_data.json"
@@ -150,7 +150,7 @@ def import_player_gamesDB(request):
     import os
     import json
 
-    filepath = '/Users/judd/VscodeProjects/finalfantasy/data_scraping/player_data_folder' #right click and use 'copyfull path' as paste here
+    filepath = '/home/tomi/Sandbox/ffdata/player_data_folder' #right click and use 'copyfull path' as paste here
     print("Hello from import_player_gamesDB") #debug
     print("is Connected: {}".format(connections.isConnected())) #debug
     filename = "game_data.json"

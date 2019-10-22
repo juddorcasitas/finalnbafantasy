@@ -5,7 +5,7 @@ import {
     useParams
 } from 'react-router-dom'
 import * as d3 from "d3";
-
+import '../../assets/Graph.css'
 function ReturnDefault(props){
     return(<div>
         <h3>Build a graph</h3>
@@ -27,6 +27,239 @@ function addStyle(styles) {
   document.getElementsByTagName("head")[0].appendChild(css); 
 } 
 
+function BuildGraph4(props)
+{
+  var allGroup = ["PTS", "AST",'REB', "BLK",'TOV', "DREB"]
+
+  var parseDate = d3.timeParse("%d/%m/%Y"); 
+ // set the dimensions and margins of the graph
+ var margin = {top: 10, right: 30, bottom: 30, left: 60},
+ width = 800 - margin.left - margin.right,
+ height = 400 - margin.top - margin.bottom;
+var chartDiv = document.getElementById("my_dataviz");
+
+ var svg = d3.select(chartDiv)
+.append("div")
+// Container class to make it responsive.
+.classed("svg-container", true) 
+.append("svg")
+.attr("viewBox", "0 0 "+ (width + margin.left + margin.right) +" " + (height+  margin.top + margin.bottom)+ "")
+.append("g")
+.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // create a tooltip
+  var Tooltip = d3.select("#my_dataviz")
+  .append("div")
+  .attr("class", "tooltip")				
+  .style("opacity", 0);
+
+
+  // Three function that change the tooltip when user hover / move / leave a cell
+  var mouseover = function(d) {
+      Tooltip.transition()		
+      .duration(200)		
+      .style("opacity", .9);
+
+      Tooltip.html(d.time + "<br/>"  + d.value)	
+      .style("left", (d3.event.pageX) + "px")		
+      .style("top", (d3.event.pageY - 28) + "px");
+
+      console.log(d.value)
+  }
+  var mousemove = function(d) {
+    Tooltip
+      .html("Exact value: " + d.value)
+      
+  }
+  var mouseleave = function(d) {
+    Tooltip
+    .transition()		
+    .duration(500)		
+    .style("opacity", 0);
+  }
+
+ var data = props.query
+ data.forEach(function(d) {
+  d.GAME_DATE = parseDate(d.GAME_DATE);
+})
+
+
+  var xScale = d3.scaleTime()
+  var yScale = d3.scaleLinear()
+
+  var xAxisCall = d3.axisBottom()
+  var yAxisCall = d3.axisLeft()
+
+
+  var line = svg.append("path")
+  var dot = svg.append("g")
+
+  
+  function initAxis() {
+    svg.append("g")
+    .attr("class", "x axis")
+    .attr("id", "xaxis")  
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxisCall.scale(xScale));
+
+    svg.append("g")
+    .attr("class", "y axis")
+    .call(yAxisCall.scale(yScale));
+}
+
+
+    
+function updateAxis(){
+  var t = d3.transition()
+      .duration(500)
+  
+  svg.select(".x")
+      .transition(t)
+      .call(xAxisCall)
+  
+  svg.select(".y")
+      .transition(t)
+      .call(yAxisCall)
+  
+}    
+
+function initPlot(data)
+{
+  line = svg.append("path")
+  .datum(data)
+  .attr("fill", "none")
+  .attr("id", "gpath")
+  .attr("d", d3.line()
+  .x(function(d) { return xScale(d.time) })
+  .y(function(d) { return yScale(d.value) })
+  )
+
+  // Add the point
+  dot = svg.append("g")
+    .selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("cx", function(d) { return xScale(d.time) } )
+    .attr("cy", function(d) { return yScale(d.value) } )
+    .attr("r", 5)
+    .attr("fill", "#000000")        
+    .on("mouseover", mouseover)
+    .on("mousemove", mousemove)
+    .on("mouseleave", mouseleave)
+}
+
+function updatePlot(data)
+{
+  var tpoints = d3.transition()
+  .duration(500)
+
+  line
+  .datum(data)
+  .transition(tpoints)
+  .attr("d", d3.line()
+    .x(function(d) { return xScale(+d.time) })
+    .y(function(d) { return yScale(+d.value) })
+  )
+  
+  dot
+  .data(data)
+  .transition(tpoints)
+  .attr("cx", function(d) { return xScale(+d.time) })
+  .attr("cy", function(d) { return yScale(+d.value) })
+}
+
+function plotPoint(data)
+{
+  xScale
+  .domain(d3.extent(data, function(d) { return d.time; }))
+  .range([ 0, width ]);
+
+
+  yScale
+  .domain(d3.extent(data, function(d) { return d.value; }))
+  .range([ height, 0 ]);
+
+  initPlot(data)
+
+  initAxis()
+
+}
+
+
+function updatePointsAncScale(data, duration)
+{
+
+  var tscale = d3.transition()
+  .duration(1000)
+
+  xScale
+  .domain(d3.extent(data, function(d) { return d.time; }))
+  .range([ 0, width ]);
+
+
+  yScale
+  .domain(d3.extent(data, function(d) { return d.value; }))
+  .range([ height, 0 ]);
+  
+  svg.select(".x")
+  .attr("transform", "translate(0," + height + ")")
+  .transition(tscale)
+  .call(yAxisCall.scale(xScale))
+
+  svg.select(".y")
+  .transition(tscale)
+  .call(yAxisCall.scale(yScale))
+    // Give these new data to update line
+  
+  updatePlot(data)
+
+  updateAxis()
+  
+
+}
+
+  var df = data.map(function(d){return {time: d.GAME_DATE, value:d.PTS} })
+
+  plotPoint(df)
+   
+  // add the options to the button
+  d3.select("#selectButton")
+  .selectAll('myOptions')
+  .data(allGroup)
+  .enter()
+  .append('option')
+  .text(function (d) { return d; }) // text showed in the menu
+  .attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+
+  // A function that update the chart
+  function update(selectedGroup) {
+
+  // Create new data with the selection?
+  var dataFilter = data.map(function(d){return {time: d.GAME_DATE, value:d[selectedGroup]} })
+  //console.log(dataFilter);
+    
+    updatePointsAncScale(dataFilter,1000)
+
+  }
+
+    // When the button is changed, run the updateChart function
+        d3.select("#selectButton").on("change", function(d) {
+        // recover the option that has been chosen
+        var selectedOption = d3.select(this).property("value")
+        // run the updateChart function with this selected option
+        return update(selectedOption);
+    })
+  
+        
+ 
+
+
+
+}
+
+
 
 function BuildGraph3(props)
 {
@@ -38,7 +271,10 @@ function BuildGraph3(props)
  width = 800 - margin.left - margin.right,
  height = 400 - margin.top - margin.bottom;
  // append the svg object to the body of the page
- var svg = d3.select("#my_dataviz")
+
+ var chartDiv = document.getElementById("my_dataviz");
+
+ var svg = d3.select(chartDiv)
 .append("svg")
 .attr("width", width + margin.left + margin.right)
 .attr("height", height + margin.top + margin.bottom)
@@ -75,6 +311,7 @@ function BuildGraph3(props)
       
   var line = svg.append("path")
   .datum(data)
+  .attr("class", "gLine")
   .attr("fill", "none")
   .attr("stroke", "#69b3a2")
   .attr("stroke-width", 1.5)
@@ -211,177 +448,6 @@ function BuildGraph3(props)
 
 }
 
-function BuildGraph(props)
-{
-
-      // List of groups (here I have one group per column)
-      var allGroup = ["PTS", "AST", "BLK","DREB",'WL','TOV','REB']
-
-
-    // add the options to the button
-    d3.select("#selectButton")
-      .selectAll('myOptions')
-     	.data(allGroup)
-      .enter()
-    	.append('option')
-      .text(function (d) { return d; }) // text showed in the menu
-      .attr("value", function (d) { return d; }) // corresponding value returned by the button
-  // set the dimensions and margins of the graph
-var margin = {top: 10, right: 30, bottom: 30, left: 60},
-width = 8000 - margin.left - margin.right,
-height = 400 - margin.top - margin.bottom;
-// append the svg object to the body of the page
-var svg = d3.select("#my_dataviz")
-.append("svg")
-.attr("width", width + margin.left + margin.right)
-.attr("height", height + margin.top + margin.bottom)
-.append("g")
-.attr("transform",
-      "translate(" + margin.left + "," + margin.top + ")");
-
-      // Parse the date / time
-      var parseDate = d3.timeParse("%d/%m/%Y"); 
-
-
-var data = props.query
-data.forEach(function(d) {
-  d.GAME_DATE = parseDate(d.GAME_DATE);
-})
-  // Now I can use this dataset:
-  
-
-  var x = d3.scaleTime()
-  .domain(d3.extent(data, function(d) { return d.GAME_DATE; }))
-  .range([ 0, width ]);
-  var y = d3.scaleLinear()
-  .domain(d3.extent(data, function(d) { return d.PTS; }))
-  .range([ height, 0 ]);
-  
-    svg.append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
-
-    svg.append("g")
-    .call(d3.axisLeft(y));
-    // Add the line     
-    var line = svg.append("path")
-      .datum(data)
-      .attr("fill", "none")
-      .attr("stroke", "#69b3a2")
-      .attr("stroke-width", 1.5)
-      .attr("d", d3.line()
-        .x(function(d) { return x(d.GAME_DATE) })
-        .y(function(d) { return y(d.PTS) })
-        )
-    // Add the points
-    var dot = svg
-      .append("g")
-      .selectAll("dot")
-      .data(data)
-      .enter()
-      .append("circle")
-        .attr("cx", function(d) { return x(d.GAME_DATE) } )
-        .attr("cy", function(d) { return y(d.PTS) } )
-        .attr("r", 5)
-        .attr("fill", "#000000")
-
-         // A function that update the chart
-    function update(selectedGroup) {
-
-      // Create new data with the selection?
-      var dataFilter = data.map(function(d){return {time: d.GAME_DATE, value:d[selectedGroup]} })
-      //console.log(dataFilter);
-
-      var y = d3.scaleLinear()
-      .domain(d3.extent(dataFilter, function(d) { return d.value; }))
-      .range([ height, 0 ]);
-
-      var t = d3.transition()
-      .duration(500)
-
-         
-        svg.select(".y")
-            .transition(t)
-            .call(d3.axisLeft(y))
-      // Give these new data to update line
-      line
-          .datum(dataFilter)
-          .transition()
-          .duration(1000)
-          .attr("d", d3.line()
-            .x(function(d) { return x(d.time) })
-            .y(function(d) { return y(d.value) })
-          )
-      dot
-        .data(dataFilter)
-        .transition()
-        .duration(1000)
-          .attr("cx", function(d) { return x(d.time) })
-          .attr("cy", function(d) { return y(d.value) })
-
-          var y2 = svg.selectAll(".y")
-          .data(["dummy"])
-          
-      var newY = y2.enter().append("g")
-          .attr("class", "y axis")
-          .attr("transform", "translate("+[margin.left, margin.top]+")")
-
-          y2.merge(newY).transition(t).call(y)
-
-    }
-
-    // When the button is changed, run the updateChart function
-    d3.select("#selectButton").on("change", function(d) {
-        // recover the option that has been chosen
-        var selectedOption = d3.select(this).property("value")
-        // run the updateChart function with this selected option
-        return update(selectedOption);
-    })
-    // create a tooltip
-    var Tooltip = d3.select("#my_dataviz")
-      .append("div")
-      .style("opacity", 0)
-      .attr("class", "tooltip")
-      .style("background-color", "white")
-      .style("border", "solid")
-      .style("border-width", "2px")
-      .style("border-radius", "5px")
-      .style("padding", "5px")
-
-      // Three function that change the tooltip when user hover / move / leave a cell
-      var mouseover = function(d) {
-        Tooltip
-          .style("opacity", 1)
-      }
-      var mousemove = function(d) {
-        Tooltip
-          .html("Exact value: " + d.value)
-          .style("left", (d3.mouse(this)[0]+70) + "px")
-          .style("top", (d3.mouse(this)[1]) + "px")
-      }
-      var mouseleave = function(d) {
-        Tooltip
-          .style("opacity", 0)
-      }
-
-    // Add the points
-    svg
-      .append("g")
-      .selectAll("dot")
-      .data(data)
-      .enter()
-      .append("circle")
-        .attr("class", "myCircle")
-        .attr("cx", function(d) { return x(d.date) } )
-        .attr("cy", function(d) { return y(d.value) } )
-        .attr("r", 8)
-        .attr("stroke", "#69b3a2")
-        .attr("stroke-width", 3)
-        .attr("fill", "white")
-        .on("mouseover", mouseover)
-        .on("mousemove", mousemove)
-        .on("mouseleave", mouseleave)
-}
 
 function PlayerDataTable(props){
     const [playerInfo, setPlayerInfo] = useState({});
@@ -410,7 +476,7 @@ function PlayerDataTable(props){
         var graphData = data;
         setPlayerInfo(data['query']);
         console.log(graphData);
-        return BuildGraph3(graphData);
+        return BuildGraph4(graphData);
       })
       .catch(function(err) {
         console.log('Fetch Error :-S', err);
