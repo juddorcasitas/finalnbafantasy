@@ -118,7 +118,7 @@ def retreive_graph_data(request):
     player_route = request.GET['player_route']
     collection_id = "player_"+player_route
     print("Col ID: {}".format(collection_id))
-    year = 1995
+    year = 2018
     month = 8
     day = 21
     end = datetime.now()
