@@ -4,7 +4,7 @@ import SearchBar from '../search/search'
 import {
     useParams
 } from 'react-router-dom'
-import FindNBAteam from '../utils/NBAteams'
+import NBAteams from '../utils/NBAteams'
 
 function ReturnDefault(props){
     return(<div>
@@ -80,7 +80,19 @@ function PlayerDataTable(props){
                 {Object.keys(playerInfo).filter(key => key.toString() === "Draft")
                     .map((key,index) => 
                     <tr key={index}>
-                        {playerInfo[key].map((x, i) => <td key={i}>{x}</td> )}
+                        <td>
+                            {NBAteams.teamAbr(playerInfo[key][0])}
+                            <img height="40" width="40" src={NBAteams.logoLink(playerInfo[key][0])} alt={NBAteams.teamAbr(playerInfo[key][0])}></img>
+                        </td>
+                        <td>
+                            {playerInfo[key][1]}
+                        </td>
+                        <td>
+                        {playerInfo[key][2]}
+                        </td>
+                        <td>
+                        {playerInfo[key][3]}
+                        </td>
                     </tr>
                     )}
             </tbody>
@@ -98,10 +110,16 @@ function PlayerDataTable(props){
                     <tbody key={index}>
                         {playerInfo[key].map((x, i) => 
                         <tr key={i}>
-                            {x.map((val, indx) => 
-                            <td key={indx}>
-                            {val}
-                            </td>)}
+                            <td>
+                                {NBAteams.teamAbr(x[0])}
+                                <img height="40" width="40" src={NBAteams.logoLink(x[0])} alt={NBAteams.teamAbr(x[0])}></img>
+                            </td>
+                            <td>
+                                {x[1]}
+                            </td>
+                            <td>
+                                {x[2]}
+                            </td>
                         </tr> )}
                     </tbody>
                     )}

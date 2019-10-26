@@ -1,5 +1,5 @@
-export default function FindNBAteam(teamNumber){
-let teamDict = {
+var NBAteams = function (){
+this.teamDict = {
     'ATL': "1610612737",
     'BKN': "1610612751",
     'BOS': "1610612738",
@@ -31,12 +31,15 @@ let teamDict = {
     'UTA': '1610612762',
     'WAS': '1610612764'
     }
-
-    let teamAbr = Object.keys(teamDict).find(key => teamDict[key] === teamNumber);
-    let logoLink = "http://127.0.0.1:8000/media/player_headshots/"+ teamAbr +".svg";
-    return {
-        logo: logoLink,
-        team: teamAbr
-    };
 };
+
+NBAteams.prototype.teamAbr = function(teamNumber){
+    return Object.keys(this.teamDict).find(key => this.teamDict[key] === teamNumber);
+}
+
+NBAteams.prototype.logoLink = function(teamNumber){
+    return "http://127.0.0.1:8000/media/team_logos/"+ this.teamAbr(teamNumber) +".svg";
+}
+
+export default (new NBAteams());
 
