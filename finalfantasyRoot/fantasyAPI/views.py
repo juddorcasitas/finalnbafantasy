@@ -8,17 +8,30 @@ import json
 # Create your views here.
 def player_search(request):
     print("Hello from search") #debug
-    player_name = request.GET['player_name']
-    query = { '$or' : [ {"firstName" : 
-                            { "$regex": ".*{}.*".format(player_name), 
-                            '$options':'i'
-                            } 
-                        },   {"lastName" : 
-                                { "$regex": ".*{}.*".format(player_name),
-                                 '$options':'i' 
+    player_name = request.GET['player_name'].split()
+    print(player_name)
+    if(len(player_name) > 1):
+        query = { '$and' : [ {"firstName" : 
+                                { "$regex": ".*{}.*".format(player_name[0]), 
+                                '$options':'i'
                                 } 
-                            } 
-                        ]}
+                            },   {"lastName" : 
+                                    { "$regex": ".*{}.*".format(player_name[1]),
+                                    '$options':'i' 
+                                    } 
+                                }
+                            ]}
+    else:
+        query = { '$or' : [ {"firstName" : 
+                                { "$regex": ".*{}.*".format(player_name[0]), 
+                                '$options':'i'
+                                } 
+                            },   {"lastName" : 
+                                    { "$regex": ".*{}.*".format(player_name[0]),
+                                    '$options':'i' 
+                                    } 
+                                }
+                            ]}
     applyFilter = {
                 "_id": 0, 
                 "firstName": 1, 
@@ -56,7 +69,7 @@ def player_search(request):
 def retreive_player_info(request):
     print("Hello from search") #debug
     personId = request.GET['personId']
-    filepath = '/data_scraping/player_headshots'
+    # filepath = '/data_scraping/player_headshots'
     query ={
         'personId': "{}".format(personId)}
     print(query) #debug
