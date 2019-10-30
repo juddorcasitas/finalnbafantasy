@@ -1,4 +1,3 @@
-import React, {useState, useEffect} from 'react'
 import * as d3 from "d3";
 import '../../assets/Graph.css'
 
@@ -23,6 +22,7 @@ function SingleGenericGraph(graphDiv,props)
     var allGroup = ["PTS", "AST",'REB', "BLK",'TOV', "DREB","FG3A","FG3M","FG3_PCT","FGA","FGM","FG_PCT","FTA","FTM","FT_PCT","MIN","OREB","PF","PLUS_MINUS","STL"]
   
 
+    var props = Object.assign({}, props);
     var parseDate = d3.timeParse("%d/%m/%Y"); 
    // set the dimensions and margins of the graph
    var margin = {top: 10, right: 30, bottom: 30, left: 60},
@@ -117,6 +117,7 @@ function SingleGenericGraph(graphDiv,props)
   
   function initPlot(data)
   {
+    console.log(data)
     line = svg.append("path")
     .datum(data)
     .attr("fill", "none")
