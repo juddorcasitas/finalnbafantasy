@@ -1,6 +1,5 @@
 class classNames {
     constructor(){
-
         this.wrapperLarge = "wrapper-large";
         this.wrapperMedium = "wrapper-medium";
         this.wrapperSmall = "wrapper-small";
@@ -8,9 +7,10 @@ class classNames {
         this.search = "search";
         this.searchPlayerRow = "search-player-row";
         this.main = "Main";
-        this.header = "App-header";
+        this.header = "header";
         this.home = "home";
-
+        this.headerLeft = "headerComponentLeft";
+        this.headerRight = "headerComponentRight";
 
     }
 }

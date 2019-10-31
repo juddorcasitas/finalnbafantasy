@@ -30,3 +30,16 @@ th{
 td{
   text-align: left;
 }
+
+.header {
+  overflow: hidden;
+  padding: 20px 10px;
+}
+
+.headerComponentLeft{
+  float: left;
+}
+
+.headerComponentRight {
+  float: right;
+}
