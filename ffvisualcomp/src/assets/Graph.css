@@ -1,6 +1,6 @@
 #gpath{
     stroke-width : 1.5;
-    stroke : #69b3a2;
+    stroke : #e00000;
     stroke-width : 1.5;
 }
 
@@ -38,58 +38,48 @@
   list-style-type:none;
 }
 
-ul[role='tablist'],
-ul[role='tablist'] li {
-  display: block;
-  list-style: none;
-  margin: 0;
+
+.tabs {
+  margin: 0 0 1.4rem;
   padding: 0;
+  list-style-type: none;
 }
 
-ul[role='tablist'] {
-  margin-bottom: -1px;
-}
-
-ul[role='tablist']:after {
-  content: " ";
-  display: block;
-  clear: both;
-  height: 0;
-}
-
-ul[role='tablist'] li {
-  display: block;
+.tab {
   float: left;
-  position: relative;
-  z-index: 1;
-  margin-right: .25rem;
 }
 
-ul[role='tablist'] li a {
-  font-weight: bold;
-  text-decoration: none;
+.tab a {
+  border-bottom: 1px solid #233e75;
+  border-top: 1px solid #18294f;
+}
 
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
+.tab a[aria-selected="true"] {
+  border-bottom-color: #18294f;
+  border-top-color: #233e75;
+  border-left: 1px solid #233e75;
+  border-right: 1px solid #233e75;
+}
+
+.tab a {
   display: block;
-  background: #f9f9f9;
-  padding: .25rem .5rem;
-
-  border-color: #999;
-  border-style: solid;
-  border-width: 1px;
+  padding: .5em .9em;
+  color: #fff;
 }
 
-ul[role='tablist'] li a[aria-selected='true'] {
-  border-bottom-color: #f9f9f9;
+.tab-panel {
+  display: none;
 }
 
-section[role='tabpanel'] {
-  border-top-right-radius: 4px;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-  border: 1px solid #999;
-  background: #f9f9f9;
-  padding: .5rem;
-  margin-bottom: 1rem;
+.tab-panel[aria-hidden="false"] {
+  display: block;
+}
+
+.panel {
+  padding: 1em;
+}
+
+.panel-head {
+  margin-top: 0;
+  margin-bottom: 1.4rem;
 }

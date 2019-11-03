@@ -1,5 +1,4 @@
 import * as d3 from "d3";
-import '../../assets/Graph.css'
 
 function addStyle(styles) { 
               
@@ -21,9 +20,6 @@ function SingleGenericGraph(graphDiv,props)
 
     var allGroup = ["PTS", "AST",'REB', "BLK",'TOV', "DREB","FG3A","FG3M","FG3_PCT","FGA","FGM","FG_PCT","FTA","FTM","FT_PCT","MIN","OREB","PF","PLUS_MINUS","STL"]
   
-
-    var props = Object.assign({}, props);
-    var parseDate = d3.timeParse("%d/%m/%Y"); 
    // set the dimensions and margins of the graph
    var margin = {top: 10, right: 30, bottom: 30, left: 60},
    width = 800 - margin.left - margin.right,
@@ -70,11 +66,7 @@ function SingleGenericGraph(graphDiv,props)
       .style("opacity", 0);
     }
   
-   var data = props.query
-   data.forEach(function(d) {
-    d.GAME_DATE = parseDate(d.GAME_DATE);
-  })
-  
+ 
   
     var xScale = d3.scaleTime()
     var yScale = d3.scaleLinear()
@@ -212,7 +204,7 @@ function SingleGenericGraph(graphDiv,props)
   
   }
   
-    var df = data.map(function(d){return {time: d.GAME_DATE, value:d.PTS} })
+    var df = props.map(function(d){return {time: d.GAME_DATE, value:d.PTS} })
   
     plotPoint(df)
      
@@ -230,7 +222,7 @@ function SingleGenericGraph(graphDiv,props)
     function update(selectedGroup) {
   
     // Create new data with the selection?
-    var dataFilter = data.map(function(d){return {time: d.GAME_DATE, value:d[selectedGroup]} })
+    var dataFilter = props.map(function(d){return {time: d.time, value:d[selectedGroup]} })
     //console.log(dataFilter);
       
       updatePointsAncScale(dataFilter,1000)
