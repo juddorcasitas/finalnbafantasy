@@ -40,13 +40,12 @@ function GraphController(playerDataJson)
   var graphContent = document.createElement("div")
   var tabList = []
   var grabTabList = []
+
   d3.select(graphTabs).attr("class","tab-group").append("ul").attr("role","tablist").attr("class", "tabs clearfix").attr("id", "graph-controller-bar")
-  d3.select(graphContent).attr("class","tab-content")
+  d3.select(graphContent).attr("class","tab-panels")
 
   chartDiv.append(graphTabs)
   chartDiv.append(graphContent)
-
-  var d2 = Object.assign({}, playerDataJson);
 
   //WIP FOR ADD TAB BUTTON
   // var AddButton = document.createElement("li")
@@ -57,8 +56,8 @@ function GraphController(playerDataJson)
   //   .attr("class", "addTab")
   //   .attr("data-toggle","tab")
   //   .on("click",addGraph(d2))
-    // graphTabs.append(AddButton)
-    // tabList.push(AddButton)
+  // graphTabs.append(AddButton)
+  // tabList.push(AddButton)
   
   console.log(playerDataJson)
 
@@ -92,13 +91,19 @@ function GraphController(playerDataJson)
     tabList.push(tab)
     var graph = document.createElement("div")
     d3.select(graph)
-    .attr("class","tab-pane")
+    .attr("class","tab-panel")
     .attr("role","tabpanel")
     .attr("id",liID.toString()+"_tab")
     .attr("aria-hidden","false");
 
-    d3.select(graphTabs).selectAll('ul').append(tab)
+
+    var graph_col = document.getElementById("graph-controller-bar");
+
+    graph_col.appendChild(tab)
+
     grabTabList.push(graph)
+
+
     var g = SingleGenericGraph(graph,data)
     graphContent.append(graph)
     GraphList.push(g)
@@ -143,7 +148,7 @@ function GraphController(playerDataJson)
     
 //   }
 
-changeTabs()
+changeTabs();
 
 }
 
