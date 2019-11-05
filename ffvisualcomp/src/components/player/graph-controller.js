@@ -11,25 +11,26 @@ function ReturnDefault(props){
     </div>);
 }
 
-function changeTabs()
-{
-   var $tabs = $('.tabs');
-   var $panels = $('.panels');
 
-   $tabs.on('click', 'a', function(e){
-    e.preventDefault();
+var $tabs = $('.tabs');
+var $panels = $('.panels');
 
-    var id = $(this).attr('href');
+$tabs.on('click', 'a', function(e){
+e.preventDefault();
 
-    $panels.filter('[aria-hidden="false"]').attr('aria-hidden', true);
-    $tabs.find('[aria-selected="true"]').attr('aria-selected', false);
+var id = $(this).attr('href');
 
-    $(this).attr('aria-selected', true);
-    $(id).attr('aria-hidden', false);
-   })
+$panels.filter('[aria-hidden="false"]').attr('aria-hidden', true);
+$tabs.find('[aria-selected="true"]').attr('aria-selected', false);
+
+$(this).attr('aria-selected', true);
+$(id).attr('aria-hidden', false);
+})
+
+var switchGraph = function(d) {
+  console.log("HELLO FROM SWITCH GRAPH")
+  console.log(d)
 }
-
-
 
 function GraphController(playerDataJson)
 {
@@ -85,7 +86,8 @@ function GraphController(playerDataJson)
     .html(liID.toString())
     .attr("class", "atab")
     .attr("href","#"+liID.toString()+"_tab")
-    .attr("data-toggle","tab");
+    .attr("data-toggle","tab")
+    .on("click",switchGraph, liID.toString());
 
     
     tabList.push(tab)
@@ -102,7 +104,6 @@ function GraphController(playerDataJson)
     graph_col.appendChild(tab)
 
     grabTabList.push(graph)
-
 
     var g = SingleGenericGraph(graph,data)
     graphContent.append(graph)
@@ -138,17 +139,6 @@ function GraphController(playerDataJson)
   addGraph(data)
   addGraph(data)
   addGraph(data)
-// function addPlayerData(pData)
-// {
-//    playerDataList.push(pData);
-// }
-
-//   function updateGraph()
-//   {
-    
-//   }
-
-changeTabs();
 
 }
 
