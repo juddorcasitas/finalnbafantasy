@@ -1,5 +1,6 @@
 import React, {Component} from "react"
 import classNames from '../utils/class-css'
+import { Input } from '@material-ui/core';
 import {
     Link,
 } from 'react-router-dom'
@@ -99,7 +100,7 @@ class SearchBar extends Component {
         return (
             <div className={classNames.wrapperLarge}>
                 <div className={classNames.search}>
-                    <input 
+                    <Input 
                         type="text" 
                         className="searchTerm" 
                         placeholder="Search Current Players"
@@ -108,7 +109,7 @@ class SearchBar extends Component {
                         onChange={(e) => this.handleChange(e)}
                         ref={ (input) => this.userInput = input}
                         pattern="^[^-\s][\w\s-]+$"
-                        ></input>
+                        ></Input>
 
                     <div className={classNames.wrapperModal}>
                         {Object.keys(this.state.results).map((key, index) =>
