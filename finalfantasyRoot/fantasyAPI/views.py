@@ -6,6 +6,10 @@ import pymongo
 import json
 
 # Create your views here.
+def welcome(request):
+    print("Hello OPEN API")
+    return HttpResponse("API is Up", content_type='text/html')
+
 def player_search(request):
     print("Hello from search") #debug
     player_name = request.GET['player_name'].split()
@@ -118,7 +122,7 @@ def retreive_graph_data(request):
     player_route = request.GET['player_route']
     collection_id = "player_"+player_route
     print("Col ID: {}".format(collection_id))
-    year = 1995
+    year = 2018
     month = 8
     day = 21
     end = datetime.now()

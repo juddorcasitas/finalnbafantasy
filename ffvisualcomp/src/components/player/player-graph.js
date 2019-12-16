@@ -20,6 +20,10 @@ function addStyle(styles) {
 
 function BuildGraph4(props)
 {
+  // remove current chart
+
+  d3.select(".svg-container").remove()
+  d3.selectAll(".player-graph-option").remove()
   var allGroup = ["PTS", "AST",'REB', "BLK",'TOV', "DREB"]
 
   var parseDate = d3.timeParse("%d/%m/%Y"); 
@@ -112,10 +116,9 @@ function updateAxis(){
       .transition(t)
       .call(yAxisCall)
   
-}    
+}
 
-function initPlot(data)
-{
+function initPlot(data){
   line = svg.append("path")
   .datum(data)
   .attr("fill", "none")
@@ -140,8 +143,7 @@ function initPlot(data)
     .on("mouseleave", mouseleave)
 }
 
-function updatePlot(data)
-{
+function updatePlot(data){
   var tpoints = d3.transition()
   .duration(500)
 
@@ -172,7 +174,6 @@ function plotPoint(data)
   .range([ height, 0 ]);
 
   initPlot(data)
-
   initAxis()
 
 }
@@ -220,6 +221,7 @@ function updatePointsAncScale(data, duration)
   .data(allGroup)
   .enter()
   .append('option')
+  .classed("player-graph-option", true) 
   .text(function (d) { return d; }) // text showed in the menu
   .attr("value", function (d) { return d; }) // corresponding value returned by the button
 
@@ -271,7 +273,7 @@ function DisplayGraph(props){
         //console.log(data['query']);
         var graphData = data;
         setPlayerInfo(data['query']);
-        console.log(graphData);
+        console.log({"player Data": graphData});
         return BuildGraph4(graphData);
       })
       .catch(function(err) {
