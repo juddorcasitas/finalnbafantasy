@@ -1,7 +1,9 @@
 import React, {useState, useEffect} from 'react'
 import classNames from '../utils/class-css'
-import * as d3 from "d3";
-import '../../assets/Graph.css'
+import SearchBar from '../search/search'
+import {
+    useParams
+} from 'react-router-dom'
 
 function addStyle(styles) { 
               
@@ -176,6 +178,10 @@ function plotPoint(data)
   initPlot(data)
   initAxis()
 
+function ReturnDefault(props){
+    return(<div>
+        <h3>Build a graph</h3>
+    </div>);
 }
 
 
@@ -282,6 +288,7 @@ function DisplayGraph(props){
       }, [player_route]);
     return(
       <div>
+      <p>Hello From Graphs</p>
       <select id="selectButton"></select>
       <div id="my_dataviz"></div>
       </div>
@@ -289,10 +296,23 @@ function DisplayGraph(props){
 }
 
 function GraphCanvas(props){
+    let {playerURL} = useParams();
+
+    if (playerURL){
+        return (
+            <div className={classNames.wrapperLarge}>
+                <h1>Find Player stats</h1>
+                <SearchBar></SearchBar>
+                <PlayerDataTable url={playerURL}/>
+            </div>);
+    }
     return (
-      <div className={classNames.wrapperLarge}>
-        <DisplayGraph url={props.url}/>
-      </div>);
+    <div className={classNames.wrapperLarge}>
+        <h1>Find Player stats</h1>
+        <SearchBar></SearchBar>
+        <ReturnDefault/>
+    </div>);
 }
+
 
 export default GraphCanvas;

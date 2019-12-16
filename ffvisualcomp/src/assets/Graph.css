@@ -1,6 +1,6 @@
 #gpath{
     stroke-width : 1.5;
-    stroke : #69b3a2;
+    stroke : #e00000;
     stroke-width : 1.5;
 }
 
@@ -31,4 +31,79 @@
     border: 0px;		
     border-radius: 8px;			
     pointer-events: none;			
+}
+
+#graph-controller-bar {
+  display:inline-block;
+  list-style-type:none;
+}
+
+
+.tabs {
+  margin: 0 0 1.4rem;
+  padding: 0;
+  list-style-type: none;
+}
+
+.tab {
+  float: left;
+}
+
+.tab a {
+  border-bottom: 1px solid #233e75;
+  border-top: 1px solid #18294f;
+}
+
+.tab a[aria-selected="true"] {
+  border-bottom-color: #18294f;
+  border-top-color: #233e75;
+  border-left: 1px solid #233e75;
+  border-right: 1px solid #233e75;
+}
+
+.tab a {
+  display: block;
+  padding: .5em .9em;
+  color: #fff;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel[aria-hidden="false"] {
+  display: block;
+}
+
+.panel {
+  padding: 1em;
+}
+
+.panel-head {
+  margin-top: 0;
+  margin-bottom: 1.4rem;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333333;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 16px;
+  text-decoration: none;
+}
+
+li a:hover {
+  background-color: #111111;
 }
