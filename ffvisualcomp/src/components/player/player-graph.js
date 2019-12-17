@@ -1,9 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import classNames from '../utils/class-css'
-import SearchBar from '../search/search'
-import {
-    useParams
-} from 'react-router-dom'
+import * as d3 from "d3";
 
 function addStyle(styles) { 
               
@@ -23,7 +20,7 @@ function addStyle(styles) {
 function BuildGraph4(props)
 {
   // remove current chart
-
+  
   d3.select(".svg-container").remove()
   d3.selectAll(".player-graph-option").remove()
   var allGroup = ["PTS", "AST",'REB', "BLK",'TOV', "DREB"]
@@ -87,9 +84,47 @@ var chartDiv = document.getElementById("my_dataviz");
   var xAxisCall = d3.axisBottom()
   var yAxisCall = d3.axisLeft()
 
+  var mouseG = svg.append("g")
+      .attr("class", "mouse-over-effects");
 
   var line = svg.append("path")
   var dot = svg.append("g")
+  mouseG.append("path") // this is the black vertical line to follow mouse
+    .attr("class", "mouse-line")
+    .style("stroke", "black")
+    .style("stroke-width", "1px")
+    .style("opacity", "0");
+  mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
+    .attr('width', width) // can't catch mouse events on a g element
+    .attr('height', height)
+    .attr('fill', 'none')
+    .attr('pointer-events', 'all')
+    .on('mouseout', function() { // on mouse out hide line, circles and text
+      d3.select(".mouse-line")
+        .style("opacity", "0");
+      d3.selectAll(".mouse-per-line circle")
+        .style("opacity", "0");
+      d3.selectAll(".mouse-per-line text")
+        .style("opacity", "0");
+    })
+    .on('mouseover', function() { // on mouse in show line, circles and text
+      d3.select(".mouse-line")
+        .style("opacity", "1");
+      d3.selectAll(".mouse-per-line circle")
+        .style("opacity", "1");
+      d3.selectAll(".mouse-per-line text")
+        .style("opacity", "1");
+    })
+    .on('mousemove', function() { // mouse moving over canvas
+      var mouse = d3.mouse(this);
+      d3.select(".mouse-line")
+        .attr("d", function() {
+          var d = "M" + mouse[0] + "," + height;
+          d += " " + mouse[0] + "," + 0;
+          return d;
+        });
+  
+    });
 
   
   function initAxis() {
@@ -104,8 +139,6 @@ var chartDiv = document.getElementById("my_dataviz");
     .call(yAxisCall.scale(yScale));
 }
 
-
-    
 function updateAxis(){
   var t = d3.transition()
       .duration(500)
@@ -121,13 +154,34 @@ function updateAxis(){
 }
 
 function initPlot(data){
+  console.log(data.map((d) => {return d.value}));
+  var prevPrevVal = 0;
+  var prevVal = 0;
+  var curVal = 0;
   line = svg.append("path")
   .datum(data)
   .attr("fill", "none")
   .attr("id", "gpath")
   .attr("d", d3.line()
   .x(function(d) { return xScale(d.time) })
-  .y(function(d) { return yScale(d.value) })
+//.y0(yScale(0))
+  .y(function(d, i) {
+    if (i == 0) {
+      prevPrevVal  = yScale(d.value);
+      prevVal = yScale(d.value);
+      curVal =  yScale(d.value);
+  } else if (i == 1) {
+      prevPrevVal = prevVal;
+      prevVal = curVal;
+      curVal = (prevVal + yScale(d.value)) / 2.0;
+  } else {
+      prevPrevVal = prevVal;
+      prevVal = curVal;
+      curVal = (prevPrevVal + prevVal + yScale(d.value)) / 3.0;
+  }
+  return curVal;
+  })
+  .curve(d3.curveBasis)
   )
 
   // Add the point
@@ -138,23 +192,43 @@ function initPlot(data){
     .append("circle")
     .attr("cx", function(d) { return xScale(d.time) } )
     .attr("cy", function(d) { return yScale(d.value) } )
-    .attr("r", 5)
-    .attr("fill", "#000000")        
+    .attr("r", 2)
+    .attr("fill", "#69b3a2")        
     .on("mouseover", mouseover)
     .on("mousemove", mousemove)
     .on("mouseleave", mouseleave)
+
 }
 
 function updatePlot(data){
   var tpoints = d3.transition()
   .duration(500)
-
+  var prevPrevVal = 0;
+  var prevVal = 0;
+  var curVal = 0;
   line
   .datum(data)
   .transition(tpoints)
   .attr("d", d3.line()
     .x(function(d) { return xScale(+d.time) })
-    .y(function(d) { return yScale(+d.value) })
+    //.y0(yScale(+0))
+    .y(function(d, i) {
+      if (i == 0) {
+        prevPrevVal  = yScale(d.value);
+        prevVal = yScale(d.value);
+        curVal =  yScale(d.value);
+    } else if (i == 1) {
+        prevPrevVal = prevVal;
+        prevVal = curVal;
+        curVal = (prevVal + yScale(d.value)) / 2.0;
+    } else {
+        prevPrevVal = prevVal;
+        prevVal = curVal;
+        curVal = (prevPrevVal + prevVal + yScale(d.value)) / 3.0;
+    }
+    return curVal;
+    })
+    .curve(d3.curveBasis)
   )
   
   dot
@@ -172,18 +246,12 @@ function plotPoint(data)
 
 
   yScale
-  .domain(d3.extent(data, function(d) { return d.value; }))
+  .domain([0, d3.max(data, function(d) { return +d.value; })])
   .range([ height, 0 ]);
 
   initPlot(data)
   initAxis()
-
-function ReturnDefault(props){
-    return(<div>
-        <h3>Build a graph</h3>
-    </div>);
 }
-
 
 function updatePointsAncScale(data, duration)
 {
@@ -197,7 +265,7 @@ function updatePointsAncScale(data, duration)
 
 
   yScale
-  .domain(d3.extent(data, function(d) { return d.value; }))
+  .domain([0, d3.max(data, function(d) { return +d.value; })])
   .range([ height, 0 ]);
   
   svg.select(".x")
@@ -217,7 +285,7 @@ function updatePointsAncScale(data, duration)
 
 }
 
-  var df = data.map(function(d){return {time: d.GAME_DATE, value:d.PTS} })
+  var df = data.map(function(d){return {time: d.GAME_DATE, value:d.PTS} });
 
   plotPoint(df)
    
@@ -288,31 +356,18 @@ function DisplayGraph(props){
       }, [player_route]);
     return(
       <div>
-      <p>Hello From Graphs</p>
-      <select id="selectButton"></select>
-      <div id="my_dataviz"></div>
       </div>
    );  // trying to build a graph with the infomation 
 }
 
 function GraphCanvas(props){
-    let {playerURL} = useParams();
-
-    if (playerURL){
-        return (
-            <div className={classNames.wrapperLarge}>
-                <h1>Find Player stats</h1>
-                <SearchBar></SearchBar>
-                <PlayerDataTable url={playerURL}/>
-            </div>);
-    }
     return (
-    <div className={classNames.wrapperLarge}>
-        <h1>Find Player stats</h1>
-        <SearchBar></SearchBar>
-        <ReturnDefault/>
-    </div>);
+        <div className={classNames.wrapperLarge}>
+            <select id="selectButton"></select>
+            <div id="my_dataviz"></div>
+            <DisplayGraph url={props.url}/>
+        </div>
+    );
 }
-
 
 export default GraphCanvas;

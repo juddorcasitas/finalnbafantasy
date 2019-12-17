@@ -7,9 +7,10 @@ import {
     useParams
 } from 'react-router-dom'
 
+
 function ReturnDefault(props){
     return(<div>
-        <h3>Search for a player</h3>
+        <h1>Find Player stats</h1>
     </div>);
 }
 
@@ -19,18 +20,20 @@ function PlayerProfile(props){
     if (playerURL){
         return (
             <div className={classNames.wrapperLarge}>
-                <h1>Find Player stats</h1>
+                <h3>Search for a player</h3>
                 <SearchBar></SearchBar>
                 <PlayerDataTable url={playerURL}/>
                 <GraphCanvas url={playerURL}></GraphCanvas>
             </div>);
     }
-    return (
-    <div className={classNames.wrapperLarge}>
-        <h1>Find Player stats</h1>
+    
+    return(
+        <div>
+        <ReturnDefault></ReturnDefault>
         <SearchBar></SearchBar>
-        <ReturnDefault/>
-    </div>);
+        </div>
+        
+    );
 }
 
 export default PlayerProfile;
